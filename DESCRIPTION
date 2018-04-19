@@ -1,0 +1,12 @@
+Package: MetaWebAssemblyModels
+Type: Package
+Title: What the Package Does in One 'Title Case' Line
+Version: 1.0
+Date: 2018-03-28
+Author: Leonardo Saravia
+Maintainer: Leonardo Saravia <lsaravia@ungs.edu.ar>
+Description: Simulate Network Assembly processes
+License: GPL (>= 2)
+Imports: Rcpp (>= 0.12.16)
+LinkingTo: Rcpp
+RoxygenNote: 6.0.1

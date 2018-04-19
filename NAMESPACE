@@ -1,0 +1,3 @@
+useDynLib(MetaWebAssemblyModels, .registration=TRUE)
+exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
