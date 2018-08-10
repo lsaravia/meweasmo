@@ -21,7 +21,8 @@ using namespace Rcpp;
 // [[Rcpp::export]]
 List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int time) {
   
-  IntegerVector S(time);
+  IntegerVector SL(time);      // Species with links vector, the total number of species could be bigger. 
+
   IntegerVector LL(time);
   auto rho = metaW.nrow();     // meta web should be a square matrix
   
@@ -54,9 +55,9 @@ List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int ti
             Spc[s]=true;
       }
     // Update number of species
-    S[t]=sum(Spc);
+    // SL[t]=sum(Spc);
     DBG("Spc: ", Spc)  
-    DBG("St:  ",S[t])
+    DBG("SLt:  ",SL[t])
       
     // Add interactions that exists in the metaweb then j<--i j=predator i=prey
     //  
@@ -72,7 +73,7 @@ List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int ti
       }
       DBG("Interactions A: \n",A)
       L = sum(A);
-      DBG("L ", L)
+      DBG("SL ", SL)
         
       // Extinctions  a L / S^2
       //
@@ -91,7 +92,6 @@ List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int ti
             for( auto j=0; j<rho; j++) {   
               A(i,j)=false; // j-->i
             }
-            S[t]--;
             Spc[i]=false;
           }
         }
@@ -113,7 +113,6 @@ List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int ti
                 A(i,j)=false; // j-->i
               }
               noSecondary=true;
-              S[t]--;
               Spc[i]=false;
             }
           }
@@ -121,9 +120,11 @@ List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int ti
       }
     } while (noSecondary);
     DBG("Extinctions A: \n",A)
-    L = sum(A);  // Calculate L after secondary extinctions 
+    L = sum(A);  // Calculate L after secondary extinctions
+    SL[t] = sum((colSums(A)>0)+(rowSums(A)>0)>0); // Species with links
+ 
     DBG("L :", L)
-    DBG("St:",S[t])
+    DBG("St:",SL[t])
     DBG("Spc:",Spc)
     DBG("Basal:",Bas)
     LL[t]=L;  
@@ -131,19 +132,19 @@ List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int ti
   }
   unsigned long BB = sum(Bas*Spc);  // Basal species can become exctinct
   
-  return List::create(Named("S") = S, 
+  return List::create(Named("S") = SL,
                       Named("L") = LL,
                       Named("B") = BB,
                       Named("A") = A);
-  
+
+ 
 }
 
 
 /*** R
-require(Rcpp)
 set.seed(123)
 
-A <- matrix(c(c(0,1,1,1,0),c(0,0,1,0,1),c(0,0,0,0,0),c(0,0,1,1,0),c(0,0,0,1,0)),nrow = 5,byrow=TRUE)
+# A <- matrix(c(c(0,1,1,1,0),c(0,0,1,0,1),c(0,0,0,0,0),c(0,0,1,1,0),c(0,0,0,1,0)),nrow = 5,byrow=TRUE)
 
 # If q=0 no interactions only basal species survive because secondary extinctions kill all the ones without preys
 A0 <- metaWebNetAssembly(A,0.2,0,0,20)
