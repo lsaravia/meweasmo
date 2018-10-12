@@ -15,3 +15,8 @@ metaWebNetAssembly <- function(metaW, m, q, a, time) {
     .Call(`_MetaWebAssemblyModels_metaWebNetAssembly`, metaW, m, q, a, time)
 }
 
+#'               and the adjacency matrix A. 
+metaWebNetAssemblyGLV <- function(metaW, m, r, ini, time, tau = 0.01) {
+    .Call(`_MetaWebAssemblyModels_metaWebNetAssemblyGLV`, metaW, m, r, ini, time, tau)
+}
+

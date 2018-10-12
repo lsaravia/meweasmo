@@ -10,11 +10,17 @@ using namespace Rcpp;
 
 //’ Simulation of a neutral network assembly procesess
 //’
+//’ This model simulates an assembly process starting from basal species, that could be fixed with the 
+//’   parameter BB or allowed to migrate with rate m. The interactions are established with probability q with 
+//’   no restrictions, execpt that double interactions A->B, B->A and self interactions are not allowed. The model 
+//’   simulates secondary extinctions, when a predator has all his preys extinct it will become locally exctinct.
+//’ 
 //’ @param rho metacommunity number of species
 //’ @param m   migration rate (probability) from the meta-web   
 //’ @param q   probability of interaction 
-//’ @param a   mortality parameter for C   
-//’ @param BB  number of initial species present 
+//’ @param a   probability of extinction    
+//’ @param time   time of simulation   
+//’ @param BB  number of initial basal species present 
 //’ @return
 // [[Rcpp::export]]
 List neutralNetAssembly(double rho,double m, double q, double a, int time, int BB=0) {
@@ -145,6 +151,11 @@ List neutralNetAssembly(double rho,double m, double q, double a, int time, int B
 
 //’ Simulation of a Cascade fod web assembly procesess
 //’
+//’ This model simulates an assembly process starting from basal species, that could be fixed with the 
+//’   parameter BB or allowed to migrate with rate m. The interactions are established with probability q 
+//’   if species i>j then i becomes predator and j prey  (i<--j). The model simulates secondary extinctions, 
+//’   when a predator has all his preys extinct it will become locally exctinct.
+//’ 
 //’ @param rho    metacommunity number of species
 //’ @param m      migration rate (probability) from the meta-web   
 //’ @param q      probability of interaction 
