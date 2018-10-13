@@ -25,9 +25,10 @@ List generateGLVparms(NumericMatrix adjM, double ef, double predIntMax=0.01 ) {
   LogicalMatrix A(rho,rho);   // Local adyacency matrix
   NumericVector r(rho);     // Growth rates 
   NumericVector m(rho);     // Migration rates
-  LogicalMatrix Bas(rho);    // Basal species
+  LogicalVector Bas(rho);    // Basal species
 
-  Bas = true;               // Set to all species basal
+  // Set to all species basal
+  std::fill(Bas.begin(), Bas.end(), true);
   
   DBG("Basales: \n",Bas)
   DBG("A: \n",A)
@@ -58,6 +59,7 @@ List generateGLVparms(NumericMatrix adjM, double ef, double predIntMax=0.01 ) {
           A(i,j)=A(j,i)=true;
           adjM(i,j)=runif(1,0,predIntMax)[0];
           adjM(j,i)=runif(1,0,predIntMax)[0];
+          Bas[j]=false;                                 // Predators are not basal
           
         } else if( adjM(i,j)>0 && adjM(i,j)==0 ){    // Comensalism
           
@@ -80,13 +82,13 @@ List generateGLVparms(NumericMatrix adjM, double ef, double predIntMax=0.01 ) {
       if(Bas[i]) {
         adjM(i,i) = -runif(1,0,predIntMax*0.1)[0];
         r[i] = runif(1,0,1)[0];
-        m[i] = runif(1,0,predIntMax*0.01)[0];
+        m[i] = runif(1,0,1)[0];
         
       }
       else {
         adjM(i,i) = -runif(1,0,predIntMax*0.01)[0];
         r[i] = -runif(1,0,1)[0];
-        m[i] = runif(1,0,predIntMax*0.01)[0];
+        m[i] = runif(1,0,1)[0];
       }
     }
   DBG("Basales: \n",Bas)
@@ -99,3 +101,25 @@ List generateGLVparms(NumericMatrix adjM, double ef, double predIntMax=0.01 ) {
   
   
 }
+
+/*** R
+set.seed(123)
+
+# Predator Prey dynamics
+#
+A <- matrix(c(-0.001, -0.08,
+                0.01, 0   ),nrow = 2,byrow=TRUE)
+
+A1 <- generateGLVparms(A,0.1)
+
+
+A <- matrix(c(-0.001,  -0.01,     0,
+               0.001,      0,  -0.01,
+                   0,  0.002,     0),nrow = 3,byrow=TRUE)
+A1 <- generateGLVparms(A,0.1)
+#A1$m <- c(0,0,0)
+ini <- c(10,10,10)
+#NumericMatrix metaW,NumericVector m, NumericVector r, NumericVector ini, int time, double tau=0.01)
+A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,ini,200,0.1)
+A2$STime
+*/
