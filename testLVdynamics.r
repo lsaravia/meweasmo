@@ -134,6 +134,39 @@ require(ggplot2)
 ggplot(df, aes(time,N,colour=Species)) + geom_line() + geom_point(data=df1,aes(time,N,colour=Species),size=0.1) + theme_bw() + scale_color_viridis_d()
 
 #
+# Generate random parameters from the adjacency matrix
 #
-#
+require(igraph)
 
+#### ER random graph
+build.random.structure <- function(n, connectance){
+  S <- matrix(0, nrow = n, ncol = n)
+  S[upper.tri(S)] <- rbinom(n * (n - 1)/2,size = 1, p = connectance)
+  S[lower.tri(S)] <- rbinom(n * (n - 1)/2,size = 1, p = connectance)
+  #S <- S + t(S)
+  #diag(S) <- 0
+  return(S)    
+}
+
+
+
+# Size 106, links 4623
+require(EcoNetwork)
+C <- 4623/(106*106)
+g <- sample_gnm(106,4623,directed = TRUE, loops = TRUE)
+plotTrophLevel(g)
+calcTopologicalIndices(g)
+
+a <- as_adj(g,sparse = FALSE)
+a <- build.random.structure(106,C)
+g <- graph_from_adjacency_matrix(a,mode="directed")
+plotTrophLevel(g)
+calcTopologicalIndices(g)
+
+A1 <- generateGLVparmsFromAdj(A,0.01)
+A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,yini,600,0.1)
+df1 <- as.data.frame(t(A2$STime))
+df1$time <- 1:600
+require(tidyr)
+df1 <- gather(df1,key="Species",value="N", V1:V6)
+ggplot(df1, aes(time,N,colour=Species)) + geom_line() +  theme_bw() + scale_color_viridis_d()

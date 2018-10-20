@@ -81,6 +81,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// generateRandomGLVadjMat
+IntegerMatrix generateRandomGLVadjMat(int numSp, double C, NumericVector propInt);
+RcppExport SEXP _MetaWebAssemblyModels_generateRandomGLVadjMat(SEXP numSpSEXP, SEXP CSEXP, SEXP propIntSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type numSp(numSpSEXP);
+    Rcpp::traits::input_parameter< double >::type C(CSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type propInt(propIntSEXP);
+    rcpp_result_gen = Rcpp::wrap(generateRandomGLVadjMat(numSp, C, propInt));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_MetaWebAssemblyModels_neutralNetAssembly", (DL_FUNC) &_MetaWebAssemblyModels_neutralNetAssembly, 6},
@@ -88,6 +101,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MetaWebAssemblyModels_metaWebNetAssembly", (DL_FUNC) &_MetaWebAssemblyModels_metaWebNetAssembly, 5},
     {"_MetaWebAssemblyModels_metaWebNetAssemblyGLV", (DL_FUNC) &_MetaWebAssemblyModels_metaWebNetAssemblyGLV, 6},
     {"_MetaWebAssemblyModels_generateGLVparmsFromAdj", (DL_FUNC) &_MetaWebAssemblyModels_generateGLVparmsFromAdj, 3},
+    {"_MetaWebAssemblyModels_generateRandomGLVadjMat", (DL_FUNC) &_MetaWebAssemblyModels_generateRandomGLVadjMat, 3},
     {NULL, NULL, 0}
 };
 
