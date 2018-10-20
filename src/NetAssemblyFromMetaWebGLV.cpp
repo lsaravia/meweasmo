@@ -36,7 +36,7 @@ List metaWebNetAssemblyGLV(NumericMatrix metaW,NumericVector m, NumericVector r,
   // Initial values  
   Spc = ini;
   
-  // Fill adyacency matrix A and number of species SL
+  // Fill directed adyacency matrix A and number of species SL
   //
   for(auto i=0; i<rho; i++ ) {
     if(Spc[i]>0){
@@ -45,11 +45,17 @@ List metaWebNetAssemblyGLV(NumericMatrix metaW,NumericVector m, NumericVector r,
     }
     for( auto j=0; j<rho; j++) {
       if(Spc[j]>0 && metaW(i,j)!=0 ){
+        if(metaW(i,j)<0 && metaW(j,i)>0){ // predator prey
           A(i,j)=true;
-          DBG("A ",A)
-        } else
+          A(j,i)=false;
+        } else if(metaW(i,j)>0 && metaW(j,i)<0) {
           A(i,j)=false;
-        
+          A(j,i)=true;
+        } else
+          A(i,j)=true;
+      }
+      else 
+        A(i,j)=false;
     }
   }
   
@@ -94,7 +100,7 @@ List metaWebNetAssemblyGLV(NumericMatrix metaW,NumericVector m, NumericVector r,
     
     // End of tauStep cycle
 
-    // Fill adyacency matrix A and number of species SL
+    // Fill adyacency matrix A to determine directed Links and number of species SL 
     //
     for(auto i=0; i<rho; i++ ) {
       if(Spc[i]>0){
@@ -102,15 +108,22 @@ List metaWebNetAssemblyGLV(NumericMatrix metaW,NumericVector m, NumericVector r,
         ST(i,t)=Spc[i];
         }
         for( auto j=0; j<rho; j++) {
-          if(Spc[j]>0 && metaW(i,j)!=0 )
-            A(i,j)=true;
+          if(Spc[j]>0 && metaW(i,j)!=0 ){
+            if(metaW(i,j)<0 && metaW(j,i)>0){ // predator prey
+              A(i,j)=true;
+              A(j,i)=false;
+            } else if(metaW(i,j)>0 && metaW(j,i)<0) {
+              A(i,j)=false;
+              A(j,i)=true;
+            } else
+              A(i,j)=true;
+          }
           else 
             A(i,j)=false;
-          
       }
     }
     
-    // number of links LL
+    // number of directed links LL
     //
     LL[t] = sum(A);  
 

@@ -25,3 +25,7 @@ generateGLVparmsFromAdj <- function(adjM, ef, predIntMax = 0.01) {
     .Call(`_MetaWebAssemblyModels_generateGLVparmsFromAdj`, adjM, ef, predIntMax)
 }
 
+generateRandomGLVadjMat <- function(numSp, C, propInt) {
+    .Call(`_MetaWebAssemblyModels_generateRandomGLVadjMat`, numSp, C, propInt)
+}
+

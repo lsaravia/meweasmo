@@ -3,10 +3,10 @@
 
 using namespace Rcpp;
 
-#define DBG(MSG,X) Rcpp::Rcout << MSG << X << std::endl;
-#define DBG4(MSG,X,XX,Y,Z) Rcpp::Rcout << MSG << X << " " << XX << " " << Y << " " << Z << std::endl;
-//#define DBG(MSG,X) 
-//#define DBG4(MSG,X,XX,Y,Z) 
+//#define DBG(MSG,X) Rcpp::Rcout << MSG << X << std::endl;
+//#define DBG4(MSG,X,XX,Y,Z) Rcpp::Rcout << MSG << X << " " << XX << " " << Y << " " << Z << std::endl;
+#define DBG(MSG,X) 
+#define DBG4(MSG,X,XX,Y,Z) 
 
 
 //’ Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix  
@@ -15,7 +15,8 @@ using namespace Rcpp;
 //’                   the parameters of the LV model then a predator prey interaction will be adjM(i,j)=-1 
 //’                   adjM(j,i)=1 where j is the predator and i the prey. Competitive interaction is adjM(i,j)=adjM(j,i)=-1
 //’ @param ef         Eficiency of predator prey interactions
-//’ @param predIntMax Maxium value for the interaction intensity of predator-preys 
+//’ @param predIntMax Maximum value for the interaction intensity of predator-preys, competition, mutalistic, and  also set 
+//’                   the value of diagonal entries that represent self-limitation. 
 //’ @return           A list with the final the number of species by time S, the number of links by time L, the number of basal species
 //'                   and the adjacency matrix A. 
 // [[Rcpp::export]]
@@ -27,9 +28,11 @@ List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax=0.
   NumericVector r(rho);     // Growth rates 
   NumericVector m(rho);     // Migration rates
   LogicalVector Bas(rho);    // Basal species
-
+  LogicalVector Mut(rho);    // Mutualistic species
+  
   // Set to all species basal
   std::fill(Bas.begin(), Bas.end(), true);
+  std::fill(Mut.begin(), Mut.end(), false);
   
   DBG("Basales: \n",Bas)
   DBG("A: \n",A)
@@ -62,17 +65,17 @@ List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax=0.
           A(i,j)=A(j,i)=true;
           adjM(i,j)=runif(1,0,predIntMax)[0];
           adjM(j,i)=runif(1,0,predIntMax)[0];
-          Bas[j]=false;                                 // Predators are not basal
-          DBG("Mutualism ", adjM(i,j))    
+          DBG("Mutualism ", adjM(i,j))   
+          Mut[j]=Mut[i]=true;
             
-        } else if( adjM(i,j)>0 && adjM(i,j)==0 ){    // Comensalism
+        } else if( adjM(i,j)>0 && adjM(j,i)==0 ){    // Comensalism
           
           A(i,j)=true;
           adjM(i,j)=runif(1,0,predIntMax)[0];
           Bas[j]=false;
           DBG("Comensalism ", adjM(i,j))    
             
-        } else if( adjM(i,j)<0 && adjM(i,j)==0 ){    // Amensalism
+        } else if( adjM(i,j)<0 && adjM(j,i)==0 ){    // Amensalism
           
           A(i,j)=true;
           adjM(i,j)=-runif(1,0,predIntMax)[0];
@@ -86,19 +89,30 @@ List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax=0.
   }
     
   for(auto i=0;i<rho; i++ ) {
-      if(Bas[i]) {
+    if (Mut[i]) {
+      adjM(i,i) = -runif(1,0,predIntMax*10)[0];
+      if(rbinom(1,1,0.5)[0]==1)                                 // Random Obligate mutualism
+        r[i] = runif(1,0,1)[0];
+      else
+        r[i] = -runif(1,0,1)[0];
+      
+      m[i] = runif(1,0,1)[0];
+      
+    }
+    else if(Bas[i]) {
         adjM(i,i) = -runif(1,0,predIntMax*0.1)[0];
         r[i] = runif(1,0,1)[0];
         m[i] = runif(1,0,1)[0];
         
-      }
-      else {
+    }  
+    else {
         adjM(i,i) = -runif(1,0,predIntMax*0.01)[0];
         r[i] = -runif(1,0,1)[0];
         m[i] = runif(1,0,1)[0];
       }
     }
   DBG("Basales: \n",Bas)
+  DBG("Mutualistas: \n",Mut)
   DBG("A: \n",A)
   DBG("adjM: \n", adjM)    
     
@@ -108,6 +122,9 @@ List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax=0.
   
   
 }
+
+
+
 
 /*** R
 set.seed(123)
@@ -132,21 +149,24 @@ A <- matrix(c(-1,  -1,     0,    0,
                1,   0,     1,    0,
                0,  -1,     0,    1,
                0,   0,     1,    0),nrow = 4,byrow=TRUE)
+A1 <- generateGLVparmsFromAdj(A,0.1)
 
-A <- matrix(c(0,   1,     0,    0,
+
+A <- matrix(c(0,   1,     1,    0,
               1,   0,     1,    0,
-              0,   1,     0,    1,
+              1,   1,     0,    1,
               0,   0,     1,    0),nrow = 4,byrow=TRUE)
 
 
-A1 <- generateGLVparms(A,0.1)
-#A1$m <- c(0,0,0)
-ini <- c(10,10,10,10)
+A1 <- generateGLVparmsFromAdj(A,0.1)
+#A1$m <- c(0,0,0,0)
+ini <- c(0,0,0,0)
+
 #NumericMatrix metaW,NumericVector m, NumericVector r, NumericVector ini, int time, double tau=0.01)
 A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,ini,200,0.1)
 A2$STime
 
-A1 <- generateGLVparms(A,0.1)
+A1 <- generateGLVparmsFromAdj(A,0.1)
 #A1$m <- c(0,0,0)
 ini <- c(10,10,10,10)
 #NumericMatrix metaW,NumericVector m, NumericVector r, NumericVector ini, int time, double tau=0.01)
