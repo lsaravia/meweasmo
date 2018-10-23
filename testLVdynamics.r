@@ -1,5 +1,5 @@
 #
-# Test LV dynamics
+# Test package against LV dynamics 
 #
 
 require(deSolve)
@@ -75,7 +75,6 @@ require(ggplot2)
 ggplot(df, aes(time,N,colour=Species)) + geom_line() + geom_point(data=df1,aes(time,N,colour=Species),size=0.1) + theme_bw() + scale_color_viridis_d()
 
 
-
 #
 # LV with migration
 #
@@ -134,7 +133,7 @@ require(ggplot2)
 ggplot(df, aes(time,N,colour=Species)) + geom_line() + geom_point(data=df1,aes(time,N,colour=Species),size=0.1) + theme_bw() + scale_color_viridis_d()
 
 #
-# Generate random parameters from the adjacency matrix
+# Generate random adjacency matrix 
 #
 require(igraph)
 
@@ -149,24 +148,84 @@ build.random.structure <- function(n, connectance){
 }
 
 
-
+#
 # Size 106, links 4623
+#
 require(EcoNetwork)
+
 C <- 4623/(106*106)
-g <- sample_gnm(106,4623,directed = TRUE, loops = TRUE)
-plotTrophLevel(g)
-calcTopologicalIndices(g)
 
-a <- as_adj(g,sparse = FALSE)
-a <- build.random.structure(106,C)
-g <- graph_from_adjacency_matrix(a,mode="directed")
-plotTrophLevel(g)
-calcTopologicalIndices(g)
+#
+# Generate random GLV matrix
+#
 
-A1 <- generateGLVparmsFromAdj(A,0.01)
+A <- generateRandomGLVadjMat(106,C,c(0.0,0.5,0.0,0.0,0.0)) 
+A1 <- generateGLVparmsFromAdj(A,0.001)
+yini <- rep(0,times=nrow(A1$interM))
+
 A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,yini,600,0.1)
+A2$STime[,600]
 df1 <- as.data.frame(t(A2$STime))
 df1$time <- 1:600
 require(tidyr)
-df1 <- gather(df1,key="Species",value="N", V1:V6)
-ggplot(df1, aes(time,N,colour=Species)) + geom_line() +  theme_bw() + scale_color_viridis_d()
+require(ggplot2)
+require(dplyr)
+df1 <- gather(df1,key="Species",value="N", V1:V106)
+ggplot(filter(df1,time>500), aes(time,N,colour=Species)) + geom_line() +  theme_bw() + scale_color_viridis_d(guide=FALSE) 
+
+df1 <- data_frame(time=1:600,S = A2$S,C = A2$L/(A2$S*A2$S))
+ggplot(filter(df1,time>500), aes(time,S)) + geom_line() +  theme_bw() + scale_color_viridis_d() 
+
+ggplot(filter(df1,time>500), aes(time,C)) + geom_line() +  theme_bw() + scale_color_viridis_d() 
+
+calcPropInteractionsGLVadjMat(A1$interM,A2$STime[,600])
+
+
+
+#
+# To igraph
+#
+
+diag(A2$A) <- 0
+g <- graph_from_adjacency_matrix(A2$A,mode="directed")
+plotTrophLevel(g,modules=TRUE)
+calcTopologicalIndices(g)
+
+#
+# More testing
+#
+
+A <- generateRandomGLVadjMat(100,0.05,c(0.2,0.5,0.1,0.0,0.0)) 
+A
+A1 <- generateGLVparmsFromAdj(A,0.1,0.01)
+
+yini <- rep(1,times=nrow(A1$interM))
+
+calcPropInteractionsGLVadjMat(A1$interM,ini)
+
+A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,yini,100,0.1)
+
+df <- as.data.frame(t(A2$STime))
+df$Time <- 1:100
+require(tidyr)
+df <- gather(df,key="Species",value="N", V1:V100)
+require(ggplot2)
+ggplot(df, aes(Time,N,colour=Species)) + geom_line() +guides(colour=FALSE)
+
+calcPropInteractionsGLVadjMat(A1$interM,A2$STime[,100])
+
+# Delete diagonals
+diag(A2$A) <- FALSE
+# Delete columns and rows with no species
+d <- A2$STime[,100]!=0
+A <- A2$A[d,d]
+# Size of d == Number of species
+sum(d)==A2$S[100]
+
+g <- graph_from_adjacency_matrix(A,mode="directed")
+g
+plotTrophLevel(g)
+calcTopologicalIndices(g) # Trophic level do not work with multiple interactions types
+
+require(NetIndices)
+TrophInd(A2$A)

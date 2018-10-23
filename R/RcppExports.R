@@ -20,6 +20,10 @@ metaWebNetAssemblyGLV <- function(metaW, m, r, ini, time, tau = 0.01) {
     .Call(`_MetaWebAssemblyModels_metaWebNetAssemblyGLV`, metaW, m, r, ini, time, tau)
 }
 
+calcPropInteractionsGLVadjMat <- function(adjM, spc) {
+    .Call(`_MetaWebAssemblyModels_calcPropInteractionsGLVadjMat`, adjM, spc)
+}
+
 #'                   and the adjacency matrix A. 
 generateGLVparmsFromAdj <- function(adjM, ef, predIntMax = 0.01) {
     .Call(`_MetaWebAssemblyModels_generateGLVparmsFromAdj`, adjM, ef, predIntMax)

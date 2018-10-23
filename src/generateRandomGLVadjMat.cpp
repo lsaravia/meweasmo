@@ -150,9 +150,9 @@ A1
 
 
 # Generate a mutualistic / Predator-prey network   
-A <- generateRandomGLVadjMat(10,0.5,c(0.5,0.5,0.0,0.0,0.0)) 
+A <- generateRandomGLVadjMat(100,0.5,c(0.5,0.2,0.2,0.2,0.2)) 
 A
-A1 <- generateGLVparmsFromAdj(A,0.1,0.01)
+A1 <- generateGLVparmsFromAdj(A,0.1,0.1)
 A1
 
 #A1$m <- c(0,0,0,0)
@@ -162,4 +162,7 @@ ini <- rep(0,times=nrow(A1$interM))
 A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,ini,200,0.1)
 A2$STime
 A2$S
+A2$L
+A2$L/(A2$S*A2$S)
+
 */

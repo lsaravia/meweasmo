@@ -42,23 +42,21 @@ List metaWebNetAssemblyGLV(NumericMatrix metaW,NumericVector m, NumericVector r,
     if(Spc[i]>0){
       SL[0]+=1;                 
       ST(i,0)=Spc[i];
-    }
-    for( auto j=0; j<rho; j++) {
-      if(Spc[j]>0 && metaW(i,j)!=0 ){
-        if(metaW(i,j)<0 && metaW(j,i)>0){ // predator prey
-          A(i,j)=true;
-          A(j,i)=false;
-        } else if(metaW(i,j)>0 && metaW(j,i)<0) {
-          A(i,j)=false;
-          A(j,i)=true;
-        } else
-          A(i,j)=true;
+    
+      for( auto j=0; j<rho; j++) {
+        if(Spc[j]>0 && metaW(i,j)!=0 ){
+          if(metaW(i,j)<0 && metaW(j,i)>0){ // predator prey
+            A(i,j)=true;
+            A(j,i)=false;
+          } else if(metaW(i,j)>0 && metaW(j,i)<0) {
+            A(i,j)=false;
+            A(j,i)=true;
+          } else
+            A(i,j)=true;
+        }
       }
-      else 
-        A(i,j)=false;
     }
   }
-  
   LL[0] = sum(A);  
   
   
@@ -102,11 +100,12 @@ List metaWebNetAssemblyGLV(NumericMatrix metaW,NumericVector m, NumericVector r,
 
     // Fill adyacency matrix A to determine directed Links and number of species SL 
     //
+    std::fill(A.begin(),A.end(),false);
     for(auto i=0; i<rho; i++ ) {
       if(Spc[i]>0){
         SL[t]+=1;    
         ST(i,t)=Spc[i];
-        }
+        
         for( auto j=0; j<rho; j++) {
           if(Spc[j]>0 && metaW(i,j)!=0 ){
             if(metaW(i,j)<0 && metaW(j,i)>0){ // predator prey
@@ -118,9 +117,8 @@ List metaWebNetAssemblyGLV(NumericMatrix metaW,NumericVector m, NumericVector r,
             } else
               A(i,j)=true;
           }
-          else 
-            A(i,j)=false;
-      }
+        }
+      } 
     }
     
     // number of directed links LL
