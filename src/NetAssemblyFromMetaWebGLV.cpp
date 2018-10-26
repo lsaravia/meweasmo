@@ -44,7 +44,7 @@ List metaWebNetAssemblyGLV(NumericMatrix metaW,NumericVector m, NumericVector r,
       ST(i,0)=Spc[i];
     
       for( auto j=0; j<rho; j++) {
-        if(Spc[j]>0 && metaW(i,j)!=0 ){
+        if(Spc[j]>0 && metaW(i,j)!=0 && i!=j){
           if(metaW(i,j)<0 && metaW(j,i)>0){ // predator prey
             A(i,j)=true;
             A(j,i)=false;
@@ -107,7 +107,7 @@ List metaWebNetAssemblyGLV(NumericMatrix metaW,NumericVector m, NumericVector r,
         ST(i,t)=Spc[i];
         
         for( auto j=0; j<rho; j++) {
-          if(Spc[j]>0 && metaW(i,j)!=0 ){
+          if(Spc[j]>0 && metaW(i,j)!=0 && i!=j){
             if(metaW(i,j)<0 && metaW(j,i)>0){ // predator prey
               A(i,j)=true;
               A(j,i)=false;

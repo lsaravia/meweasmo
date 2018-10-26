@@ -159,7 +159,7 @@ C <- 4623/(106*106)
 # Generate random GLV matrix
 #
 
-A <- generateRandomGLVadjMat(106,C,c(0.0,0.5,0.0,0.0,0.0)) 
+A <- generateRandomGLVadjMat(100,0.001,c(0.0,0.5,0.0,0.0,0.0)) 
 A1 <- generateGLVparmsFromAdj(A,0.001)
 yini <- rep(0,times=nrow(A1$interM))
 
@@ -170,7 +170,7 @@ df1$time <- 1:600
 require(tidyr)
 require(ggplot2)
 require(dplyr)
-df1 <- gather(df1,key="Species",value="N", V1:V106)
+df1 <- gather(df1,key="Species",value="N", -time)
 ggplot(filter(df1,time>500), aes(time,N,colour=Species)) + geom_line() +  theme_bw() + scale_color_viridis_d(guide=FALSE) 
 
 df1 <- data_frame(time=1:600,S = A2$S,C = A2$L/(A2$S*A2$S))
