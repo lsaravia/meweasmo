@@ -9,14 +9,15 @@ using namespace Rcpp;
 #define DBG4(MSG,X,XX,Y,Z) 
 
 
-//’ Generate random Lotka-Volterra adjacency matrix with fixed proportion of interactions   
-//’
-//’ @param numSp      Integer, number of species 
-//’ @param C          Double, Probability of interaction = Connectivity = number of interacions/(numSp^2)
-//’ @param propInt    Numeric vector, Proportion of interactions, there are 5 types of interactions the elements of the vector
-//’                   represent 1= mutualism (+,+), 2=Predator-prey (+,-), 3= competition (-,-), 4=Comensalims (+,0), 
-//’                   5=Amensalism (-,0). 
-//’ @return           A NumericMatrix with the GLV type of adjacency matrix  
+//' Generate random Lotka-Volterra adjacency matrix with fixed proportion of interactions   
+//'
+//' @param numSp      Integer, number of species 
+//' @param C          Double, Probability of interaction = Connectivity = number of interacions/(numSp^2)
+//' @param propInt    Numeric vector, Proportion of interactions, there are 5 types of interactions the elements of the vector
+//'                   represent 1= mutualism (+,+), 2=Predator-prey (+,-), 3= competition (-,-), 4=Comensalims (+,0), 
+//'                   5=Amensalism (-,0). 
+//' @return           A NumericMatrix with the GLV type of adjacency matrix  
+//' @export
 // [[Rcpp::export]]
 IntegerMatrix generateRandomGLVadjMat(int numSp, double C, NumericVector propInt) {
   

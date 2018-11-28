@@ -10,17 +10,18 @@ using namespace Rcpp;
 
 
 
-//’ Simulation of an Assembly process from a Meta-web assuming stochastic Generalized Lotka-Volterra
-//’ Local dynamics  
-//’
-//’ @param metaW  NumericMatrix, metacommunity interaction matrix, the values and the signs are the parameters of the LV model  
-//’ @param m      NumericVector, migration rate (probability) from the meta-web   
-//’ @param r      NumericVector, grow rate of species, could be negative
-//’ @param ini    NumericVector, initial condition, or 0  
-//’ @param time   Number of time steps of simulation
-//’ @param tau    Number of integration steps for Tau leap method 
-//’ @return       A list with the final the number of species by time S, the number of links by time L, the number of basal species
+//' Simulation of an Assembly process from a Meta-web assuming stochastic Generalized Lotka-Volterra
+//' Local dynamics  
+//'
+//' @param metaW  NumericMatrix, metacommunity interaction matrix, the values and the signs are the parameters of the LV model  
+//' @param m      NumericVector, migration rate (probability) from the meta-web   
+//' @param r      NumericVector, grow rate of species, could be negative
+//' @param ini    NumericVector, initial condition, or 0  
+//' @param time   Number of time steps of simulation
+//' @param tau    Number of integration steps for Tau leap method 
+//' @return       A list with the final the number of species by time S, the number of links by time L, the number of basal species
 //'               and the adjacency matrix A. 
+//' @export
 // [[Rcpp::export]]
 List metaWebNetAssemblyGLV(NumericMatrix metaW,NumericVector m, NumericVector r, NumericVector ini, int time, double tau=0.01) {
   

@@ -9,14 +9,14 @@ using namespace Rcpp;
 
 
 
-//’ Simulation of an Assembly process from a Meta-web assuming the interactions conserve in the local web 
-//’
-//’ @param metaW  metacommunity adyacency matrix 
-//’ @param m      migration rate (probability) from the meta-web   
-//’ @param q      probability of interaction 
-//’ @param a      mortality parameter for C   
-//’ @param time   Number of time steps of simulation
-//’ @return       A list with the final the number of species by time S, the number of links by time L, the number of basal species
+//' Simulation of an Assembly process from a Meta-web assuming the interactions conserve in the local web 
+//'
+//' @param metaW  metacommunity adyacency matrix 
+//' @param m      migration rate (probability) from the meta-web   
+//' @param q      probability of interaction 
+//' @param a      mortality parameter for C   
+//' @param time   Number of time steps of simulation
+//' @return       A list with the final the number of species by time S, the number of links by time L, the number of basal species
 //'               and the adjacency matrix A. 
 // [[Rcpp::export]]
 List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int time) {

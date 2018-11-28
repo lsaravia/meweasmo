@@ -9,13 +9,14 @@ using namespace Rcpp;
 #define DBG4(MSG,X,XX,Y,Z) 
 
 
-//’ Calculate the proportion of interacions types in a Lotka-Volterra adjacency matrix
-//’
-//’ @param adjM       Numeric Matrix Lotka-Volterra adjcency matrix  
-//’ @param sp         Numeric vector with the present species, if species=0 the interaction is not counted
-
-//’ @return           Numeric vector with 5 elements Matrix 1=Mutualistic (+,+), 2=Predator-prey (-,+), 3=Competitive (-,-)
-//’                   4=Comensalism (+,0), 5=Amensalism (-,0)
+//' Calculate the proportion of interacions types in a Lotka-Volterra adjacency matrix
+//'
+//' @param adjM       Numeric Matrix Lotka-Volterra adjcency matrix  
+//' @param sp         Numeric vector with the present species, if species=0 the interaction is not counted
+//' 
+//' @return           Numeric vector with 5 elements Matrix 1=Mutualistic (+,+), 2=Predator-prey (-,+), 3=Competitive (-,-)
+//'                   4=Comensalism (+,0), 5=Amensalism (-,0)
+//' @export
 // [[Rcpp::export]]
 NumericVector calcPropInteractionsGLVadjMat(NumericMatrix adjM, NumericVector spc) {
 

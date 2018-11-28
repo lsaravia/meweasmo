@@ -2,10 +2,29 @@
 % Please edit documentation in R/RcppExports.R
 \name{metaWebNetAssemblyGLV}
 \alias{metaWebNetAssemblyGLV}
-\title{and the adjacency matrix A.}
+\title{Simulation of an Assembly process from a Meta-web assuming stochastic Generalized Lotka-Volterra
+Local dynamics}
 \usage{
 metaWebNetAssemblyGLV(metaW, m, r, ini, time, tau = 0.01)
 }
+\arguments{
+\item{metaW}{NumericMatrix, metacommunity interaction matrix, the values and the signs are the parameters of the LV model}
+
+\item{m}{NumericVector, migration rate (probability) from the meta-web}
+
+\item{r}{NumericVector, grow rate of species, could be negative}
+
+\item{ini}{NumericVector, initial condition, or 0}
+
+\item{time}{Number of time steps of simulation}
+
+\item{tau}{Number of integration steps for Tau leap method}
+}
+\value{
+A list with the final the number of species by time S, the number of links by time L, the number of basal species
+              and the adjacency matrix A.
+}
 \description{
-and the adjacency matrix A.
+Simulation of an Assembly process from a Meta-web assuming stochastic Generalized Lotka-Volterra
+Local dynamics
 }

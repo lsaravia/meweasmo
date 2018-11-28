@@ -2,10 +2,30 @@
 % Please edit documentation in R/RcppExports.R
 \name{cascadeNetAssembly}
 \alias{cascadeNetAssembly}
-\title{and the adjacency matrix A.}
+\title{Simulation of a Cascade fod web assembly procesess}
 \usage{
 cascadeNetAssembly(rho, m, q, a, time, BB = 0L)
 }
+\arguments{
+\item{rho}{metacommunity number of species}
+
+\item{m}{migration rate (probability) from the meta-web}
+
+\item{q}{probability of interaction}
+
+\item{a}{extinctions of species (not proportional to C)}
+
+\item{time}{time of simulation}
+
+\item{BB}{number of basal species if 0 will be ~poison(rho*m)}
+}
+\value{
+A list with the final the number of species by time S, the number of links by time L, the number of basal species
+              and the adjacency matrix A.
+}
 \description{
-and the adjacency matrix A.
+This model simulates an assembly process starting from basal species, that could be fixed with the 
+  parameter BB or allowed to migrate with rate m. The interactions are established with probability q 
+  if species i>j then i becomes predator and j prey  (i<--j). The model simulates secondary extinctions, 
+  when a predator has all his preys extinct it will become locally exctinct.
 }

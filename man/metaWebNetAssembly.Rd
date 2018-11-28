@@ -2,10 +2,25 @@
 % Please edit documentation in R/RcppExports.R
 \name{metaWebNetAssembly}
 \alias{metaWebNetAssembly}
-\title{and the adjacency matrix A.}
+\title{Simulation of an Assembly process from a Meta-web assuming the interactions conserve in the local web}
 \usage{
 metaWebNetAssembly(metaW, m, q, a, time)
 }
+\arguments{
+\item{metaW}{metacommunity adyacency matrix}
+
+\item{m}{migration rate (probability) from the meta-web}
+
+\item{q}{probability of interaction}
+
+\item{a}{mortality parameter for C}
+
+\item{time}{Number of time steps of simulation}
+}
+\value{
+A list with the final the number of species by time S, the number of links by time L, the number of basal species
+              and the adjacency matrix A.
+}
 \description{
-and the adjacency matrix A.
+Simulation of an Assembly process from a Meta-web assuming the interactions conserve in the local web
 }

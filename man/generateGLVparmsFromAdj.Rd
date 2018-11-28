@@ -2,10 +2,27 @@
 % Please edit documentation in R/RcppExports.R
 \name{generateGLVparmsFromAdj}
 \alias{generateGLVparmsFromAdj}
-\title{and the adjacency matrix A.}
+\title{Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix}
 \usage{
-generateGLVparmsFromAdj(adjM, ef, predIntMax = 0.01)
+generateGLVparmsFromAdj(adjM, ef, predIntMax = 0.01,
+  selfLimMax = as.numeric(c(0.01, 0.01, 0.01)))
+}
+\arguments{
+\item{adjM}{NumericMatrix, metacommunity interaction matrix, the values and the signs are 
+the parameters of the LV model then a predator prey interaction will be adjM(i,j)=-1 
+adjM(j,i)=1 where j is the predator and i the prey. Competitive interaction is adjM(i,j)=adjM(j,i)=-1}
+
+\item{ef}{Eficiency of predator prey interactions}
+
+\item{predIntMax}{Maximum value for the interaction intensity of predator-preys, competition, mutalistic.}
+
+\item{selfLimMax}{Numeric vector, and  also set the maximum value for diagonal entries of the interaction matrix
+that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.}
+}
+\value{
+A list with the final the number of species by time S, the number of links by time L, the number of basal species
+                  and the adjacency matrix A.
 }
 \description{
-and the adjacency matrix A.
+Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix
 }
