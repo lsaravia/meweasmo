@@ -18,11 +18,13 @@ using namespace Rcpp;
 //' @param predIntMax Maximum value for the interaction intensity of predator-preys, competition, mutalistic. 
 //' @param selfLimMax Numeric vector, and  also set the maximum value for diagonal entries of the interaction matrix
 //'                   that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.
-//' @return           A list with the final the number of species by time S, the number of links by time L, the number of basal species
-//'                   and the adjacency matrix A. 
+//' @param migrMin    the minimum value to use as interval to generate at uniform random m from migrMin to 1
+//'                    
+//' @return           A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
 //' @export
 // [[Rcpp::export]]
-List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax=0.01, NumericVector selfLimMax = NumericVector::create(0.01, 0.01, 0.01) ) {
+List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax=0.01, NumericVector selfLimMax = NumericVector::create(0.01, 0.01, 0.01),
+                             double migrMin=0.0) {
   
   auto rho = adjM.nrow();     // meta web should be a square matrix
   
@@ -97,21 +99,18 @@ List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax=0.
         r[i] = runif(1,0,1)[0];
       else
         r[i] = -runif(1,0,1)[0];
-      
-      m[i] = runif(1,0,1)[0];
-      
     }
     else if(Bas[i]) {
         adjM(i,i) = -runif(1,0,selfLimMax[1])[0];
         r[i] = runif(1,0,1)[0];
-        m[i] = runif(1,0,1)[0];
-        
+
     }  
     else {
         adjM(i,i) = -runif(1,0,selfLimMax[2])[0];
         r[i] = -runif(1,0,1)[0];
-        m[i] = runif(1,0,1)[0];
       }
+    m[i] = runif(1,migrMin,1)[0];
+    
     }
   DBG("Basales: \n",Bas)
   DBG("Mutualistas: \n",Mut)
@@ -136,8 +135,9 @@ set.seed(123)
 A <- matrix(c(-0.001, -0.08,
                 0.01, 0   ),nrow = 2,byrow=TRUE)
 
-A1 <- generateGLVparmsFromAdj(A,0.1,selfLimMax = c(1,0.001,0.01))
+A1 <- generateGLVparmsFromAdj(A,0.1,selfLimMax = c(1,0.001,0.01),migrMin = 0.8)
 
+A1
 
 A <- matrix(c(-0.001,  -0.01,     0,
                0.001,      0,  -0.01,

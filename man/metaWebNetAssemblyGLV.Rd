@@ -21,7 +21,8 @@ metaWebNetAssemblyGLV(metaW, m, r, ini, time, tau = 0.01)
 \item{tau}{Number of integration steps for Tau leap method}
 }
 \value{
-A list with the final the number of species by time S, the number of links by time L, the number of basal species
+A list with a vector S the final the number of species by time, L the number of links by time, 
+              STime a time series of each species with dimension nrow(metaW) x time,
               and the adjacency matrix A.
 }
 \description{

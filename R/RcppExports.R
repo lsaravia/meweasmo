@@ -64,7 +64,8 @@ metaWebNetAssembly <- function(metaW, m, q, a, time) {
 #' @param ini    NumericVector, initial condition, or 0  
 #' @param time   Number of time steps of simulation
 #' @param tau    Number of integration steps for Tau leap method 
-#' @return       A list with the final the number of species by time S, the number of links by time L, the number of basal species
+#' @return       A list with a vector S the final the number of species by time, L the number of links by time, 
+#'               STime a time series of each species with dimension nrow(metaW) x time,
 #'               and the adjacency matrix A. 
 #' @export
 metaWebNetAssemblyGLV <- function(metaW, m, r, ini, time, tau = 0.01) {
@@ -92,11 +93,12 @@ calcPropInteractionsGLVadjMat <- function(adjM, spc) {
 #' @param predIntMax Maximum value for the interaction intensity of predator-preys, competition, mutalistic. 
 #' @param selfLimMax Numeric vector, and  also set the maximum value for diagonal entries of the interaction matrix
 #'                   that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.
-#' @return           A list with the final the number of species by time S, the number of links by time L, the number of basal species
-#'                   and the adjacency matrix A. 
+#' @param migrMin    the minimum value to use as interval to generate at uniform random m from migrMin to 1
+#'                    
+#' @return           A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
 #' @export
-generateGLVparmsFromAdj <- function(adjM, ef, predIntMax = 0.01, selfLimMax = as.numeric( c(0.01, 0.01, 0.01))) {
-    .Call(`_MetaWebAssemblyModels_generateGLVparmsFromAdj`, adjM, ef, predIntMax, selfLimMax)
+generateGLVparmsFromAdj <- function(adjM, ef, predIntMax = 0.01, selfLimMax = as.numeric( c(0.01, 0.01, 0.01)), migrMin = 0.0) {
+    .Call(`_MetaWebAssemblyModels_generateGLVparmsFromAdj`, adjM, ef, predIntMax, selfLimMax, migrMin)
 }
 
 #' Generate random Lotka-Volterra adjacency matrix with fixed proportion of interactions   

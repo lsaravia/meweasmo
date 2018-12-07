@@ -5,7 +5,7 @@
 \title{Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix}
 \usage{
 generateGLVparmsFromAdj(adjM, ef, predIntMax = 0.01,
-  selfLimMax = as.numeric(c(0.01, 0.01, 0.01)))
+  selfLimMax = as.numeric(c(0.01, 0.01, 0.01)), migrMin = 0)
 }
 \arguments{
 \item{adjM}{NumericMatrix, metacommunity interaction matrix, the values and the signs are 
@@ -18,10 +18,11 @@ adjM(j,i)=1 where j is the predator and i the prey. Competitive interaction is a
 
 \item{selfLimMax}{Numeric vector, and  also set the maximum value for diagonal entries of the interaction matrix
 that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.}
+
+\item{migrMin}{the minimum value to use as interval to generate at uniform random m from migrMin to 1}
 }
 \value{
-A list with the final the number of species by time S, the number of links by time L, the number of basal species
-                  and the adjacency matrix A.
+A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
 }
 \description{
 Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix
