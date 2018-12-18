@@ -12,14 +12,13 @@ using namespace Rcpp;
 //' Simulation of an Assembly process from a Meta-web assuming the interactions conserve in the local web 
 //'
 //' @param metaW  metacommunity adyacency matrix 
-//' @param m      migration rate (probability) from the meta-web   
-//' @param q      probability of interaction 
-//' @param a      mortality parameter for C   
-//' @param time   Number of time steps of simulation
+//' @param m      double migration rate (probability) from the meta-web   
+//' @param e      double extinction probability 
+//' @param time   int Number of time steps of simulation
 //' @return       A list with the final the number of species by time S, the number of links by time L, the number of basal species
 //'               and the adjacency matrix A. 
 // [[Rcpp::export]]
-List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int time) {
+List metaWebNetAssembly(LogicalMatrix metaW,double m, double e, int time) {
   
   IntegerVector SL(time);      // Species with links vector, the total number of species could be bigger. 
 
@@ -39,8 +38,6 @@ List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int ti
   }
   DBG("Basales : ",Bas)
     
-  double e = a;  // No extinctions dependent on Connectivity
-  
   for(auto t=1; t<time; t++){
     
     DBG("\n============ t: ",t)
@@ -64,10 +61,7 @@ List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int ti
     for(auto i=0; i<rho; i++ ) {
       for( auto j=0; j<rho; j++) {
         if( Spc[i] && Spc[j] && metaW(i,j)){
-            auto r=runif(1)[0];
-            if(r<q) {
-              A(i,j)=true; // i-->j
-            }
+            A(i,j)=true; // i-->j
           }
         }
       }
@@ -144,27 +138,23 @@ List metaWebNetAssembly(LogicalMatrix metaW,double m, double q, double a, int ti
 /*** R
 set.seed(123)
 
-# A <- matrix(c(c(0,1,1,1,0),c(0,0,1,0,1),c(0,0,0,0,0),c(0,0,1,1,0),c(0,0,0,1,0)),nrow = 5,byrow=TRUE)
-
-# If q=0 no interactions only basal species survive because secondary extinctions kill all the ones without preys
-A0 <- metaWebNetAssembly(A,0.2,0,0,20)
-A0
+A <- matrix(c(c(0,1,1,1,0),c(0,0,1,0,1),c(0,0,0,0,0),c(0,0,1,1,0),c(0,0,0,1,0)),nrow = 5,byrow=TRUE)
 
 # Cascade Assembly
 #
 # If m=0 no species 
-A0 <- metaWebNetAssembly(A,0,0.2,0,20)
+A0 <- metaWebNetAssembly(A,0,1,20)
 A0
 
-# If q=1 and a=0 a full interaction matrix A is expected, upper triangle less the basal species TRUE
-A0 <- metaWebNetAssembly(A,0.2,1,0,20)
+# If a=0 a full interaction matrix A is expected, upper triangle less the basal species TRUE
+A0 <- metaWebNetAssembly(A,0.2,0,20)
 A0
 
 
 
 # If q=1 and a=0 a full interaction matrix A is expected, upper triangle less the basal species TRUE
 A <- matrix(c(c(0,1,1,1,1),c(0,0,1,1,1),c(0,0,0,1,1),c(0,0,0,0,1),c(0,1,0,0,0)),nrow = 5,byrow=TRUE)
-A0 <- metaWebNetAssembly(A,0.5,0.5,0.2,20)
+A0 <- metaWebNetAssembly(A,0.5,0.2,20)
 A0
 
 # A1 <- cascadeNetAssembly1(20,0.01,0.25,1,10)

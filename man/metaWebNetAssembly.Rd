@@ -4,18 +4,16 @@
 \alias{metaWebNetAssembly}
 \title{Simulation of an Assembly process from a Meta-web assuming the interactions conserve in the local web}
 \usage{
-metaWebNetAssembly(metaW, m, q, a, time)
+metaWebNetAssembly(metaW, m, e, time)
 }
 \arguments{
 \item{metaW}{metacommunity adyacency matrix}
 
-\item{m}{migration rate (probability) from the meta-web}
+\item{m}{double migration rate (probability) from the meta-web}
 
-\item{q}{probability of interaction}
+\item{e}{double extinction probability}
 
-\item{a}{mortality parameter for C}
-
-\item{time}{Number of time steps of simulation}
+\item{time}{int Number of time steps of simulation}
 }
 \value{
 A list with the final the number of species by time S, the number of links by time L, the number of basal species

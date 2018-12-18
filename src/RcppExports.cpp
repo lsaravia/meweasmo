@@ -38,17 +38,16 @@ BEGIN_RCPP
 END_RCPP
 }
 // metaWebNetAssembly
-List metaWebNetAssembly(LogicalMatrix metaW, double m, double q, double a, int time);
-RcppExport SEXP _MetaWebAssemblyModels_metaWebNetAssembly(SEXP metaWSEXP, SEXP mSEXP, SEXP qSEXP, SEXP aSEXP, SEXP timeSEXP) {
+List metaWebNetAssembly(LogicalMatrix metaW, double m, double e, int time);
+RcppExport SEXP _MetaWebAssemblyModels_metaWebNetAssembly(SEXP metaWSEXP, SEXP mSEXP, SEXP eSEXP, SEXP timeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< LogicalMatrix >::type metaW(metaWSEXP);
     Rcpp::traits::input_parameter< double >::type m(mSEXP);
-    Rcpp::traits::input_parameter< double >::type q(qSEXP);
-    Rcpp::traits::input_parameter< double >::type a(aSEXP);
+    Rcpp::traits::input_parameter< double >::type e(eSEXP);
     Rcpp::traits::input_parameter< int >::type time(timeSEXP);
-    rcpp_result_gen = Rcpp::wrap(metaWebNetAssembly(metaW, m, q, a, time));
+    rcpp_result_gen = Rcpp::wrap(metaWebNetAssembly(metaW, m, e, time));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -112,7 +111,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_MetaWebAssemblyModels_neutralNetAssembly", (DL_FUNC) &_MetaWebAssemblyModels_neutralNetAssembly, 6},
     {"_MetaWebAssemblyModels_cascadeNetAssembly", (DL_FUNC) &_MetaWebAssemblyModels_cascadeNetAssembly, 6},
-    {"_MetaWebAssemblyModels_metaWebNetAssembly", (DL_FUNC) &_MetaWebAssemblyModels_metaWebNetAssembly, 5},
+    {"_MetaWebAssemblyModels_metaWebNetAssembly", (DL_FUNC) &_MetaWebAssemblyModels_metaWebNetAssembly, 4},
     {"_MetaWebAssemblyModels_metaWebNetAssemblyGLV", (DL_FUNC) &_MetaWebAssemblyModels_metaWebNetAssemblyGLV, 6},
     {"_MetaWebAssemblyModels_calcPropInteractionsGLVadjMat", (DL_FUNC) &_MetaWebAssemblyModels_calcPropInteractionsGLVadjMat, 2},
     {"_MetaWebAssemblyModels_generateGLVparmsFromAdj", (DL_FUNC) &_MetaWebAssemblyModels_generateGLVparmsFromAdj, 5},
