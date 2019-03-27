@@ -38,14 +38,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // metaWebNetAssembly
-List metaWebNetAssembly(LogicalMatrix metaW, double m, double e, int time);
+List metaWebNetAssembly(LogicalMatrix metaW, NumericVector m, NumericVector e, int time);
 RcppExport SEXP _MetaWebAssemblyModels_metaWebNetAssembly(SEXP metaWSEXP, SEXP mSEXP, SEXP eSEXP, SEXP timeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< LogicalMatrix >::type metaW(metaWSEXP);
-    Rcpp::traits::input_parameter< double >::type m(mSEXP);
-    Rcpp::traits::input_parameter< double >::type e(eSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type m(mSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type e(eSEXP);
     Rcpp::traits::input_parameter< int >::type time(timeSEXP);
     rcpp_result_gen = Rcpp::wrap(metaWebNetAssembly(metaW, m, e, time));
     return rcpp_result_gen;

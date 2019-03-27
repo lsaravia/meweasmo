@@ -44,12 +44,20 @@ cascadeNetAssembly <- function(rho, m, q, a, time, BB = 0L) {
 
 #' Simulation of an Assembly process from a Meta-web assuming the interactions conserve in the local web 
 #'
+#' This is a dynamical model of colonization and extinction process, with the restriction 
+#' that predators must have at least one prey species to survive in the local community,  described in [1]
+#' 
+#' @references
+#' 
+#' 1. Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux, S., Cazelles, K., et al. (2018). 
+#' The spatial scaling of species interaction networks. Nat. Ecol. Evol., 2, 782–790
+#'
 #' @param metaW  metacommunity adyacency matrix 
-#' @param m      double migration rate (probability) from the meta-web   
-#' @param e      double extinction probability 
-#' @param time   int Number of time steps of simulation
-#' @return       A list with the final the number of species by time S, the number of links by time L, the number of basal species
-#'               and the adjacency matrix A. 
+#' @param m      A numeric vector of species' migration rates (probability) from the meta-web   
+#' @param e      A numeric vector of species' extinction probability 
+#' @param time   Number of time steps of simulation
+#' @return       A list with the final the number of species by time S, the number of links by time L, 
+#'               the time series of species STime and the adjacency matrix A with effective links. 
 metaWebNetAssembly <- function(metaW, m, e, time) {
     .Call(`_MetaWebAssemblyModels_metaWebNetAssembly`, metaW, m, e, time)
 }
