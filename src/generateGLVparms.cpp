@@ -19,12 +19,13 @@ using namespace Rcpp;
 //' @param selfLimMax Numeric vector, and  also set the maximum value for diagonal entries of the interaction matrix
 //'                   that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.
 //' @param migrMin    the minimum value to use as interval to generate at uniform random m from migrMin to 1
+//' @param preserveInt if true the values of the interactions adjM[i,i] when i!=j are preserved, the minimum value to use as interval to generate at uniform random m from migrMin to 1
 //'                    
 //' @return           A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
 //' @export
 // [[Rcpp::export]]
 List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax=0.01, NumericVector selfLimMax = NumericVector::create(0.01, 0.01, 0.01),
-                             double migrMin=0.0) {
+                             double migrMin=0.0, bool preserveInt=false) {
   
   auto rho = adjM.nrow();     // meta web should be a square matrix
   
@@ -44,52 +45,97 @@ List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax=0.
   // Fill adyacency matrix A and number of species SL
   //
   A.fill_diag(true);
+  if(!preserveInt){
+    for(auto i=0; i<rho; i++ ) {
+      for( auto j=0; j<rho; j++) {
+        if(adjM(i,j)!=0 && !A(i,j)){
+          
+          if(adjM(i,j)<0 && adjM(j,i)>0) {  // j is the predator i is the prey
+            
+            A(i,j)=A(j,i)=true;
+            adjM(i,j)=-runif(1,0,predIntMax)[0];         // Random uniform number
+            adjM(j,i)= ef*-adjM(i,j);
+            Bas[j]=false;                                 // Predators are not basal
+            DBG("Predator-Prey ", adjM(i,j))    
+              
+          } else if(adjM(i,j)<0 && adjM(j,i)<0) { // Competition
   
-  for(auto i=0; i<rho; i++ ) {
-    for( auto j=0; j<rho; j++) {
-      if(adjM(i,j)!=0 && !A(i,j)){
-        
-        if(adjM(i,j)<0 && adjM(j,i)>0) {  // j is the predator i is the prey
-          
-          A(i,j)=A(j,i)=true;
-          adjM(i,j)=-runif(1,0,predIntMax)[0];         // Random uniform number
-          adjM(j,i)= ef*-adjM(i,j);
-          Bas[j]=false;                                 // Predators are not basal
-          DBG("Predator-Prey ", adjM(i,j))    
+            A(i,j)=A(j,i)=true;
+            adjM(i,j)=-runif(1,0,predIntMax)[0];
+            adjM(j,i)=-runif(1,0,predIntMax)[0];
+            DBG("Competition ", adjM(i,j))    
+              
+          } else if( adjM(i,j)>0 && adjM(j,i)>0 ){        // Mutualism
             
-        } else if(adjM(i,j)<0 && adjM(j,i)<0) { // Competition
-
-          A(i,j)=A(j,i)=true;
-          adjM(i,j)=-runif(1,0,predIntMax)[0];
-          adjM(j,i)=-runif(1,0,predIntMax)[0];
-          DBG("Competition ", adjM(i,j))    
+            A(i,j)=A(j,i)=true;
+            adjM(i,j)=runif(1,0,predIntMax)[0];
+            adjM(j,i)=runif(1,0,predIntMax)[0];
+            DBG("Mutualism ", adjM(i,j))   
+            Mut[j]=Mut[i]=true;
+              
+          } else if( adjM(i,j)>0 && adjM(j,i)==0 ){    // Comensalism
             
-        } else if( adjM(i,j)>0 && adjM(j,i)>0 ){        // Mutualism
-          
-          A(i,j)=A(j,i)=true;
-          adjM(i,j)=runif(1,0,predIntMax)[0];
-          adjM(j,i)=runif(1,0,predIntMax)[0];
-          DBG("Mutualism ", adjM(i,j))   
-          Mut[j]=Mut[i]=true;
+            A(i,j)=true;
+            adjM(i,j)=runif(1,0,predIntMax)[0];
+            Bas[j]=false;
+            DBG("Comensalism ", adjM(i,j))    
+              
+          } else if( adjM(i,j)<0 && adjM(j,i)==0 ){    // Amensalism
             
-        } else if( adjM(i,j)>0 && adjM(j,i)==0 ){    // Comensalism
-          
-          A(i,j)=true;
-          adjM(i,j)=runif(1,0,predIntMax)[0];
-          Bas[j]=false;
-          DBG("Comensalism ", adjM(i,j))    
-            
-        } else if( adjM(i,j)<0 && adjM(j,i)==0 ){    // Amensalism
-          
-          A(i,j)=true;
-          adjM(i,j)=-runif(1,0,predIntMax)[0];
-          DBG("Amensalism ", adjM(i,j))    
-            
-        }
-        DBG("adjM ",adjM)
-        DBG("A ", A)
-      } 
+            A(i,j)=true;
+            adjM(i,j)=-runif(1,0,predIntMax)[0];
+            DBG("Amensalism ", adjM(i,j))    
+              
+          }
+          DBG("adjM ",adjM)
+          DBG("A ", A)
+        } 
+      }
     }
+  }
+  else
+  {
+    // Do not touch the interaction values
+    for(auto i=0; i<rho; i++ ) {
+      for( auto j=0; j<rho; j++) {
+        if(adjM(i,j)!=0 && !A(i,j)){
+          
+          if(adjM(i,j)<0 && adjM(j,i)>0) {  // j is the predator i is the prey
+            
+            A(i,j)=A(j,i)=true;
+            //adjM(j,i)= ef*-adjM(i,j);
+            Bas[j]=false;                                 // Predators are not basal
+            DBG("Predator-Prey ", adjM(i,j))    
+              
+          } else if(adjM(i,j)<0 && adjM(j,i)<0) { // Competition
+            
+            A(i,j)=A(j,i)=true;
+            DBG("Competition ", adjM(i,j))    
+              
+          } else if( adjM(i,j)>0 && adjM(j,i)>0 ){        // Mutualism
+            
+            A(i,j)=A(j,i)=true;
+            DBG("Mutualism ", adjM(i,j))   
+              Mut[j]=Mut[i]=true;
+            
+          } else if( adjM(i,j)>0 && adjM(j,i)==0 ){    // Comensalism
+            
+            A(i,j)=true;
+            Bas[j]=false;
+            DBG("Comensalism ", adjM(i,j))    
+              
+          } else if( adjM(i,j)<0 && adjM(j,i)==0 ){    // Amensalism
+            
+            A(i,j)=true;
+            DBG("Amensalism ", adjM(i,j))    
+              
+          }
+          DBG("adjM ",adjM)
+            DBG("A ", A)
+        } 
+      }
+    }
+    
   }
     
   for(auto i=0;i<rho; i++ ) {
@@ -136,6 +182,8 @@ A <- matrix(c(-0.001, -0.08,
                 0.01, 0   ),nrow = 2,byrow=TRUE)
 
 A1 <- generateGLVparmsFromAdj(A,0.1,selfLimMax = c(1,0.001,0.01),migrMin = 0.8)
+
+A1 <- generateGLVparmsFromAdj(A,0.1,selfLimMax = c(1,0.001,0.01),migrMin = 0.8,preserveInt = TRUE)
 
 A1
 

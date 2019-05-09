@@ -80,8 +80,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // generateGLVparmsFromAdj
-List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax, NumericVector selfLimMax, double migrMin);
-RcppExport SEXP _MetaWebAssemblyModels_generateGLVparmsFromAdj(SEXP adjMSEXP, SEXP efSEXP, SEXP predIntMaxSEXP, SEXP selfLimMaxSEXP, SEXP migrMinSEXP) {
+List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax, NumericVector selfLimMax, double migrMin, bool preserveInt);
+RcppExport SEXP _MetaWebAssemblyModels_generateGLVparmsFromAdj(SEXP adjMSEXP, SEXP efSEXP, SEXP predIntMaxSEXP, SEXP selfLimMaxSEXP, SEXP migrMinSEXP, SEXP preserveIntSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -90,7 +90,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type predIntMax(predIntMaxSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type selfLimMax(selfLimMaxSEXP);
     Rcpp::traits::input_parameter< double >::type migrMin(migrMinSEXP);
-    rcpp_result_gen = Rcpp::wrap(generateGLVparmsFromAdj(adjM, ef, predIntMax, selfLimMax, migrMin));
+    Rcpp::traits::input_parameter< bool >::type preserveInt(preserveIntSEXP);
+    rcpp_result_gen = Rcpp::wrap(generateGLVparmsFromAdj(adjM, ef, predIntMax, selfLimMax, migrMin, preserveInt));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -114,7 +115,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_MetaWebAssemblyModels_metaWebNetAssembly", (DL_FUNC) &_MetaWebAssemblyModels_metaWebNetAssembly, 4},
     {"_MetaWebAssemblyModels_metaWebNetAssemblyGLV", (DL_FUNC) &_MetaWebAssemblyModels_metaWebNetAssemblyGLV, 6},
     {"_MetaWebAssemblyModels_calcPropInteractionsGLVadjMat", (DL_FUNC) &_MetaWebAssemblyModels_calcPropInteractionsGLVadjMat, 2},
-    {"_MetaWebAssemblyModels_generateGLVparmsFromAdj", (DL_FUNC) &_MetaWebAssemblyModels_generateGLVparmsFromAdj, 5},
+    {"_MetaWebAssemblyModels_generateGLVparmsFromAdj", (DL_FUNC) &_MetaWebAssemblyModels_generateGLVparmsFromAdj, 6},
     {"_MetaWebAssemblyModels_generateRandomGLVadjMat", (DL_FUNC) &_MetaWebAssemblyModels_generateRandomGLVadjMat, 3},
     {NULL, NULL, 0}
 };
