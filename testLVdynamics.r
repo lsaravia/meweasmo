@@ -58,12 +58,12 @@ A <- as.matrix(parms[,1:6])
 r<- as.numeric(parms$r)
 m <- c(0,0,0,0,0,0)
 #NumericMatrix metaW,NumericVector m, NumericVector r, NumericVector ini, int time, double tau=0.01)
-A1 <- metaWebNetAssemblyGLV(A,m,r,yini,600,0.1)
+A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 df1 <- as.data.frame(t(A1$STime))
-df1$time <- 1:600
-A1 <- metaWebNetAssemblyGLV(A,m,r,yini,600,0.1)
+df1$time <- 1:1000
+A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 df2 <- as.data.frame(t(A1$STime))
-df2$time <- 1:600
+df2$time <- 1:1000
 
 df1 <- rbind(df1,df2 )
 
@@ -74,6 +74,7 @@ df1 <- gather(df1,key="Species",value="N", N1:N6)
 require(ggplot2)
 ggplot(df, aes(time,N,colour=Species)) + geom_line() + geom_point(data=df1,aes(time,N,colour=Species),size=0.1) + theme_bw() + scale_color_viridis_d()
 
+ggplot(df1, aes(time,N,colour=Species)) + geom_point(size=0.1) +  theme_bw() + scale_color_viridis_d()
 
 #
 # LV with migration
@@ -151,7 +152,7 @@ build.random.structure <- function(n, connectance){
 #
 # Size 106, links 4623
 #
-require(EcoNetwork)
+require(multiweb)
 
 C <- 4623/(106*106)
 
@@ -159,8 +160,8 @@ C <- 4623/(106*106)
 # Generate random GLV matrix
 #
 
-A <- generateRandomGLVadjMat(100,0.001,c(0.0,0.5,0.0,0.0,0.0)) 
-A1 <- generateGLVparmsFromAdj(A,0.001)
+A <- generateRandomGLVadjMat(100,0.001,c(0.0,0.5,0.5,0.0,0.0)) 
+A1 <- generateGLVparmsFromAdj(A,0.01,0.01)
 yini <- rep(0,times=nrow(A1$interM))
 
 A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,yini,600,0.1)
@@ -172,11 +173,14 @@ require(ggplot2)
 require(dplyr)
 df1 <- gather(df1,key="Species",value="N", -time)
 ggplot(filter(df1,time>500), aes(time,N,colour=Species)) + geom_line() +  theme_bw() + scale_color_viridis_d(guide=FALSE) 
+ggplot(df1, aes(time,N,colour=Species)) + geom_line() +  theme_bw() + scale_color_viridis_d(guide=FALSE) 
 
 df1 <- data_frame(time=1:600,S = A2$S,C = A2$L/(A2$S*A2$S))
 ggplot(filter(df1,time>500), aes(time,S)) + geom_line() +  theme_bw() + scale_color_viridis_d() 
+ggplot(df1, aes(time,S)) + geom_line() +  theme_bw() + scale_color_viridis_d() 
 
 ggplot(filter(df1,time>500), aes(time,C)) + geom_line() +  theme_bw() + scale_color_viridis_d() 
+ggplot(df1, aes(time,C)) + geom_line() +  theme_bw() + scale_color_viridis_d() 
 
 calcPropInteractionsGLVadjMat(A1$interM,A2$STime[,600])
 

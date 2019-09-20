@@ -5,9 +5,10 @@
 
 [![DOI](https://zenodo.org/badge/130283899.svg)](https://zenodo.org/badge/latestdoi/130283899)
 
-This package simulates the assembly of ecological networks as food-web
-from a regional web. It uses a generalized Lotka-Volterra stochastic
-model.
+This package simulates the assembly of ecological networks from a
+regional metaweb. It uses a generalized Lotka-Volterra stochastic model.
+Species can migrate from the meta-web and establish the ecological
+interactions specified in the metaweb.
 
 License: MIT
 
@@ -27,8 +28,8 @@ library(meweasmo)
 
 ### Simulate a 6 species network without migration
 
-1)  Create a Lotka-Volterra interaction matrix with intrinsec growth
-    rate as the last column
+1)  Create a metaweb with a Lotka-Volterra interaction matrix structure,
+    I added one last column with intrinsic growth rate.
 
 <!-- end list -->
 
@@ -80,6 +81,11 @@ library(ggplot2)
 ggplot(df1, aes(time,N,colour=Species)) + geom_point(size=0.1) +  theme_bw() + scale_color_viridis_d()
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="60%" />
 
 ## References
+
+1.  Ecological Network assembly: how the regional metaweb influences
+    local food webs Leonardo A. Saravia, Tomás I. Marina, Marleen De
+    Troch, Fernando R. Momo bioRxiv 340430; doi:
+    <https://doi.org/10.1101/340430>
