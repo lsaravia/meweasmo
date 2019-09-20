@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "60%"
+  out.width = "80%"
 )
 ```
 
@@ -42,7 +42,7 @@ library(meweasmo)
 
 ### Simulate a 6 species network without migration
 
-1) Create a metaweb with a Lotka-Volterra interaction matrix structure, I added one last column with intrinsic growth rate. 
+* Create a metaweb with a Lotka-Volterra interaction matrix structure, I added one last column with intrinsic growth rate. 
 
 ```{r}
 
@@ -60,21 +60,46 @@ parms <- tibble::tribble(
 
 ```
 
-2) Set the initial conditions and simulate the model with no migration during 1000 time steps
+* Set the initial conditions and simulate the model with no migration during 1000 time steps
 
 ```{r}
 
 library(meweasmo)
 
 yini  <- c(N1 = 100, N2 = 100, N3 = 100, N4 = 100, N5 = 100, N6 = 100)
+
 A <- as.matrix(parms[,1:6])
 r<- as.numeric(parms$r)
 m <- c(0,0,0,0,0,0)
+
+```
+
+   * We can calculate the proportions of the different types of interactions using the metaweb matrix and the vector of species present, in this case all species 
+    
+```{r}
+
+calcPropInteractionsGLVadjMat(A,yini)
+```
+
+   * then run de simultation
+
+```{r}
+
 A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 
 ```
 
-3) Plot the simulation
+* Check the results of the simulation: the abundances and the proportion of interactions, at the last time step 
+
+```{r}
+
+A1$STime[,1000]
+
+calcPropInteractionsGLVadjMat(A,A1$STime[,1000])
+
+```
+
+* Plot the time series of the species 
 
 ```{r}
 

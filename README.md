@@ -28,7 +28,7 @@ library(meweasmo)
 
 ### Simulate a 6 species network without migration
 
-1)  Create a metaweb with a Lotka-Volterra interaction matrix structure,
+  - Create a metaweb with a Lotka-Volterra interaction matrix structure,
     I added one last column with intrinsic growth rate.
 
 <!-- end list -->
@@ -48,7 +48,7 @@ parms <- tibble::tribble(
 )
 ```
 
-2)  Set the initial conditions and simulate the model with no migration
+  - Set the initial conditions and simulate the model with no migration
     during 1000 time steps
 
 <!-- end list -->
@@ -58,13 +58,48 @@ parms <- tibble::tribble(
 library(meweasmo)
 
 yini  <- c(N1 = 100, N2 = 100, N3 = 100, N4 = 100, N5 = 100, N6 = 100)
+
 A <- as.matrix(parms[,1:6])
 r<- as.numeric(parms$r)
 m <- c(0,0,0,0,0,0)
+```
+
+  - We can calculate the proportions of the different types of
+    interactions using the metaweb matrix and the vector of species
+    present, in this case all species
+
+<!-- end list -->
+
+``` r
+
+calcPropInteractionsGLVadjMat(A,yini)
+#> [1] 0.2 0.6 0.0 0.1 0.1
+```
+
+  - then run de simultation
+
+<!-- end list -->
+
+``` r
+
 A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 ```
 
-3)  Plot the simulation
+  - Check the results of the simulation: the abundances and the
+    proportion of interactions, at the last time step
+
+<!-- end list -->
+
+``` r
+
+A1$STime[,1000]
+#> [1] 368 144 702 128  34 242
+
+calcPropInteractionsGLVadjMat(A,A1$STime[,1000])
+#> [1] 0.2 0.6 0.0 0.1 0.1
+```
+
+  - Plot the time series of the species
 
 <!-- end list -->
 
@@ -81,7 +116,7 @@ library(ggplot2)
 ggplot(df1, aes(time,N,colour=Species)) + geom_point(size=0.1) +  theme_bw() + scale_color_viridis_d()
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="60%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="80%" />
 
 ## References
 
