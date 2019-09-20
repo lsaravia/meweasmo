@@ -1,38 +1,50 @@
+---
+output:
+  github_document:
+    html_preview: false
+editor_options: 
+  chunk_output_type: console
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # meweasmo R-package: MEta-WEb ASsembly MOdels
 
 [![DOI](https://zenodo.org/badge/130283899.svg)](https://zenodo.org/badge/latestdoi/130283899)
 
-This package simulates the assembly of ecological networks as food-web
-from a regional web. It uses a generalized Lotka-Volterra stochastic
-model.
+This package simulates the assembly of ecological networks as food-web from a regional web. It uses a generalized Lotka-Volterra stochastic model.
 
 License: MIT
 
-## Installation
+## Installation 
 
-Using the ‘devtools’ package:
+Using the 'devtools' package:
 
-``` r
+```{r, eval=FALSE}
 
 install.packages("devtools")
 library(devtools)
 install_github('lsaravia/meweasmo')
 library(meweasmo)
+
 ```
 
 ## Get Started
 
 ### Simulate a 6 species network without migration
 
-1)  Create a Lotka-Volterra interaction matrix with intrinsec growth
-    rate as the last column
+1) Create a Lotka-Volterra interaction matrix with intrinsec growth rate as the last column 
 
-<!-- end list -->
-
-``` r
+```{r}
 
 library(tibble)
 
@@ -45,14 +57,12 @@ parms <- tibble::tribble(
     0, -1e-4,-1e-4,      0, -1e-6,    0,   0.04,
     0,     0,-1e-4,   2e-4,     0,    0,   0.00
 )
+
 ```
 
-2)  Set the initial conditions and simulate the model with no migration
-    during 1000 time steps
+2) Set the initial conditions and simulate the model with no migration during 1000 time steps
 
-<!-- end list -->
-
-``` r
+```{r}
 
 library(meweasmo)
 
@@ -61,13 +71,12 @@ A <- as.matrix(parms[,1:6])
 r<- as.numeric(parms$r)
 m <- c(0,0,0,0,0,0)
 A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
+
 ```
 
-3)  Plot the simulation
+3) Plot the simulation
 
-<!-- end list -->
-
-``` r
+```{r}
 
 df1 <- as.data.frame(t(A1$STime))
 df1$time <- 1:1000
@@ -78,8 +87,11 @@ df1 <- gather(df1,key="Species",value="N", sp1:sp6)
 
 library(ggplot2)
 ggplot(df1, aes(time,N,colour=Species)) + geom_point(size=0.1) +  theme_bw() + scale_color_viridis_d()
+
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
-
 ## References
+
+[^1]: Ecological Network assembly: how the regional metaweb influences local food webs
+Leonardo A. Saravia, Tomás I. Marina, Marleen De Troch, Fernando R. Momo
+bioRxiv 340430; doi: https://doi.org/10.1101/340430
