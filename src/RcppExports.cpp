@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // neutralNetAssembly
 List neutralNetAssembly(double rho, double m, double q, double a, int time, int BB);
-RcppExport SEXP _MetaWebAssemblyModels_neutralNetAssembly(SEXP rhoSEXP, SEXP mSEXP, SEXP qSEXP, SEXP aSEXP, SEXP timeSEXP, SEXP BBSEXP) {
+RcppExport SEXP _meweasmo_neutralNetAssembly(SEXP rhoSEXP, SEXP mSEXP, SEXP qSEXP, SEXP aSEXP, SEXP timeSEXP, SEXP BBSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -23,7 +23,7 @@ END_RCPP
 }
 // cascadeNetAssembly
 List cascadeNetAssembly(double rho, double m, double q, double a, int time, int BB);
-RcppExport SEXP _MetaWebAssemblyModels_cascadeNetAssembly(SEXP rhoSEXP, SEXP mSEXP, SEXP qSEXP, SEXP aSEXP, SEXP timeSEXP, SEXP BBSEXP) {
+RcppExport SEXP _meweasmo_cascadeNetAssembly(SEXP rhoSEXP, SEXP mSEXP, SEXP qSEXP, SEXP aSEXP, SEXP timeSEXP, SEXP BBSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -39,7 +39,7 @@ END_RCPP
 }
 // metaWebNetAssembly
 List metaWebNetAssembly(LogicalMatrix metaW, NumericVector m, NumericVector e, int time);
-RcppExport SEXP _MetaWebAssemblyModels_metaWebNetAssembly(SEXP metaWSEXP, SEXP mSEXP, SEXP eSEXP, SEXP timeSEXP) {
+RcppExport SEXP _meweasmo_metaWebNetAssembly(SEXP metaWSEXP, SEXP mSEXP, SEXP eSEXP, SEXP timeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -53,7 +53,7 @@ END_RCPP
 }
 // metaWebNetAssemblyGLV
 List metaWebNetAssemblyGLV(NumericMatrix metaW, NumericVector m, NumericVector r, NumericVector ini, int time, double tau);
-RcppExport SEXP _MetaWebAssemblyModels_metaWebNetAssemblyGLV(SEXP metaWSEXP, SEXP mSEXP, SEXP rSEXP, SEXP iniSEXP, SEXP timeSEXP, SEXP tauSEXP) {
+RcppExport SEXP _meweasmo_metaWebNetAssemblyGLV(SEXP metaWSEXP, SEXP mSEXP, SEXP rSEXP, SEXP iniSEXP, SEXP timeSEXP, SEXP tauSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -69,7 +69,7 @@ END_RCPP
 }
 // calcPropInteractionsGLVadjMat
 NumericVector calcPropInteractionsGLVadjMat(NumericMatrix adjM, NumericVector spc);
-RcppExport SEXP _MetaWebAssemblyModels_calcPropInteractionsGLVadjMat(SEXP adjMSEXP, SEXP spcSEXP) {
+RcppExport SEXP _meweasmo_calcPropInteractionsGLVadjMat(SEXP adjMSEXP, SEXP spcSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -81,7 +81,7 @@ END_RCPP
 }
 // generateGLVparmsFromAdj
 List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax, NumericVector selfLimMax, double migrMin, bool preserveInt);
-RcppExport SEXP _MetaWebAssemblyModels_generateGLVparmsFromAdj(SEXP adjMSEXP, SEXP efSEXP, SEXP predIntMaxSEXP, SEXP selfLimMaxSEXP, SEXP migrMinSEXP, SEXP preserveIntSEXP) {
+RcppExport SEXP _meweasmo_generateGLVparmsFromAdj(SEXP adjMSEXP, SEXP efSEXP, SEXP predIntMaxSEXP, SEXP selfLimMaxSEXP, SEXP migrMinSEXP, SEXP preserveIntSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -97,7 +97,7 @@ END_RCPP
 }
 // generateRandomGLVadjMat
 IntegerMatrix generateRandomGLVadjMat(int numSp, double C, NumericVector propInt);
-RcppExport SEXP _MetaWebAssemblyModels_generateRandomGLVadjMat(SEXP numSpSEXP, SEXP CSEXP, SEXP propIntSEXP) {
+RcppExport SEXP _meweasmo_generateRandomGLVadjMat(SEXP numSpSEXP, SEXP CSEXP, SEXP propIntSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -110,17 +110,17 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_MetaWebAssemblyModels_neutralNetAssembly", (DL_FUNC) &_MetaWebAssemblyModels_neutralNetAssembly, 6},
-    {"_MetaWebAssemblyModels_cascadeNetAssembly", (DL_FUNC) &_MetaWebAssemblyModels_cascadeNetAssembly, 6},
-    {"_MetaWebAssemblyModels_metaWebNetAssembly", (DL_FUNC) &_MetaWebAssemblyModels_metaWebNetAssembly, 4},
-    {"_MetaWebAssemblyModels_metaWebNetAssemblyGLV", (DL_FUNC) &_MetaWebAssemblyModels_metaWebNetAssemblyGLV, 6},
-    {"_MetaWebAssemblyModels_calcPropInteractionsGLVadjMat", (DL_FUNC) &_MetaWebAssemblyModels_calcPropInteractionsGLVadjMat, 2},
-    {"_MetaWebAssemblyModels_generateGLVparmsFromAdj", (DL_FUNC) &_MetaWebAssemblyModels_generateGLVparmsFromAdj, 6},
-    {"_MetaWebAssemblyModels_generateRandomGLVadjMat", (DL_FUNC) &_MetaWebAssemblyModels_generateRandomGLVadjMat, 3},
+    {"_meweasmo_neutralNetAssembly", (DL_FUNC) &_meweasmo_neutralNetAssembly, 6},
+    {"_meweasmo_cascadeNetAssembly", (DL_FUNC) &_meweasmo_cascadeNetAssembly, 6},
+    {"_meweasmo_metaWebNetAssembly", (DL_FUNC) &_meweasmo_metaWebNetAssembly, 4},
+    {"_meweasmo_metaWebNetAssemblyGLV", (DL_FUNC) &_meweasmo_metaWebNetAssemblyGLV, 6},
+    {"_meweasmo_calcPropInteractionsGLVadjMat", (DL_FUNC) &_meweasmo_calcPropInteractionsGLVadjMat, 2},
+    {"_meweasmo_generateGLVparmsFromAdj", (DL_FUNC) &_meweasmo_generateGLVparmsFromAdj, 6},
+    {"_meweasmo_generateRandomGLVadjMat", (DL_FUNC) &_meweasmo_generateRandomGLVadjMat, 3},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_MetaWebAssemblyModels(DllInfo *dll) {
+RcppExport void R_init_meweasmo(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

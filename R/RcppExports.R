@@ -19,7 +19,7 @@
 #'
 #' @export
 neutralNetAssembly <- function(rho, m, q, a, time, BB = 0L) {
-    .Call(`_MetaWebAssemblyModels_neutralNetAssembly`, rho, m, q, a, time, BB)
+    .Call(`_meweasmo_neutralNetAssembly`, rho, m, q, a, time, BB)
 }
 
 #' Simulation of a Cascade fod web assembly procesess
@@ -39,7 +39,7 @@ neutralNetAssembly <- function(rho, m, q, a, time, BB = 0L) {
 #'               and the adjacency matrix A. 
 #' @export
 cascadeNetAssembly <- function(rho, m, q, a, time, BB = 0L) {
-    .Call(`_MetaWebAssemblyModels_cascadeNetAssembly`, rho, m, q, a, time, BB)
+    .Call(`_meweasmo_cascadeNetAssembly`, rho, m, q, a, time, BB)
 }
 
 #' Simulation of an Assembly process from a Meta-web assuming the interactions conserve in the local web 
@@ -59,7 +59,7 @@ cascadeNetAssembly <- function(rho, m, q, a, time, BB = 0L) {
 #' @return       A list with the final the number of species by time S, the number of links by time L, 
 #'               the time series of species STime and the adjacency matrix A with effective links. 
 metaWebNetAssembly <- function(metaW, m, e, time) {
-    .Call(`_MetaWebAssemblyModels_metaWebNetAssembly`, metaW, m, e, time)
+    .Call(`_meweasmo_metaWebNetAssembly`, metaW, m, e, time)
 }
 
 #' Simulation of an Assembly process from a Meta-web assuming stochastic Generalized Lotka-Volterra
@@ -76,7 +76,7 @@ metaWebNetAssembly <- function(metaW, m, e, time) {
 #'               and the adjacency matrix A. 
 #' @export
 metaWebNetAssemblyGLV <- function(metaW, m, r, ini, time, tau = 0.01) {
-    .Call(`_MetaWebAssemblyModels_metaWebNetAssemblyGLV`, metaW, m, r, ini, time, tau)
+    .Call(`_meweasmo_metaWebNetAssemblyGLV`, metaW, m, r, ini, time, tau)
 }
 
 #' Calculate the proportion of interacions types in a Lotka-Volterra adjacency matrix
@@ -88,7 +88,7 @@ metaWebNetAssemblyGLV <- function(metaW, m, r, ini, time, tau = 0.01) {
 #'                   4=Comensalism (+,0), 5=Amensalism (-,0)
 #' @export
 calcPropInteractionsGLVadjMat <- function(adjM, spc) {
-    .Call(`_MetaWebAssemblyModels_calcPropInteractionsGLVadjMat`, adjM, spc)
+    .Call(`_meweasmo_calcPropInteractionsGLVadjMat`, adjM, spc)
 }
 
 #' Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix  
@@ -106,7 +106,7 @@ calcPropInteractionsGLVadjMat <- function(adjM, spc) {
 #' @return           A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
 #' @export
 generateGLVparmsFromAdj <- function(adjM, ef, predIntMax = 0.01, selfLimMax = as.numeric( c(0.01, 0.01, 0.01)), migrMin = 0.0, preserveInt = FALSE) {
-    .Call(`_MetaWebAssemblyModels_generateGLVparmsFromAdj`, adjM, ef, predIntMax, selfLimMax, migrMin, preserveInt)
+    .Call(`_meweasmo_generateGLVparmsFromAdj`, adjM, ef, predIntMax, selfLimMax, migrMin, preserveInt)
 }
 
 #' Generate random Lotka-Volterra adjacency matrix with fixed proportion of interactions   
@@ -119,6 +119,6 @@ generateGLVparmsFromAdj <- function(adjM, ef, predIntMax = 0.01, selfLimMax = as
 #' @return           A NumericMatrix with the GLV type of adjacency matrix  
 #' @export
 generateRandomGLVadjMat <- function(numSp, C, propInt) {
-    .Call(`_MetaWebAssemblyModels_generateRandomGLVadjMat`, numSp, C, propInt)
+    .Call(`_meweasmo_generateRandomGLVadjMat`, numSp, C, propInt)
 }
 

@@ -185,7 +185,8 @@ calcPropInteractionsGLVadjMat(A1$interM,A2$STime[,600])
 #
 # To igraph
 #
-
+require(multiweb)
+require(igraph)
 diag(A2$A) <- 0
 g <- graph_from_adjacency_matrix(A2$A,mode="directed")
 plotTrophLevel(g,modules=TRUE)
