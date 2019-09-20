@@ -22,7 +22,7 @@ that represent self-limitation, the elements of the vector represent 1=mutualist
 
 \item{migrMin}{the minimum value to use as interval to generate at uniform random m from migrMin to 1}
 
-\item{preserveInt}{if true the values of the interactions adjM[i,i] when i!=j are preserved, the minimum value to use as interval to generate at uniform random m from migrMin to 1}
+\item{preserveInt}{if true the values of the interactions adjM[i,i] when i!=j are preserved.}
 }
 \value{
 A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m

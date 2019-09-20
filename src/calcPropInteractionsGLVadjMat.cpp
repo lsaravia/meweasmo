@@ -9,7 +9,7 @@ using namespace Rcpp;
 #define DBG4(MSG,X,XX,Y,Z) 
 
 
-//' Calculate the proportion of interacions types in a Lotka-Volterra adjacency matrix
+//' Calculate the proportion of interactions types in a Lotka-Volterra adjacency matrix
 //'
 //' @param adjM       Numeric Matrix Lotka-Volterra adjcency matrix  
 //' @param sp         Numeric vector with the present species, if species=0 the interaction is not counted

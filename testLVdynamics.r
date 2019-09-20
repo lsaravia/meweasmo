@@ -111,6 +111,7 @@ yini  <- c(N1 = 0,N2=0,N3=0,N4=0,N5=0,N6=0)
 out   <- as.data.frame(ode(yini, 1:600, GLVM_det, pars))
 df <- gather(out,key="Species",value="N", -time)
 ggplot(df, aes(time,N,colour=Species)) + geom_line(size=.5)
+calcPropInteractionsGLVadjMat(A1$interM,A2$STime[,600])
 
 
 A <- as.matrix(parms[,1:6])
@@ -160,10 +161,9 @@ C <- 4623/(106*106)
 # Generate random GLV matrix
 #
 
-A <- generateRandomGLVadjMat(100,0.001,c(0.0,0.5,0.5,0.0,0.0)) 
+A <- generateRandomGLVadjMat(100,0.001,c(0.3,0.3,0.3,0.05,0.05)) 
 A1 <- generateGLVparmsFromAdj(A,0.01,0.01)
 yini <- rep(0,times=nrow(A1$interM))
-
 A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,yini,600,0.1)
 A2$STime[,600]
 df1 <- as.data.frame(t(A2$STime))
@@ -181,9 +181,24 @@ ggplot(df1, aes(time,S)) + geom_line() +  theme_bw() + scale_color_viridis_d()
 
 ggplot(filter(df1,time>500), aes(time,C)) + geom_line() +  theme_bw() + scale_color_viridis_d() 
 ggplot(df1, aes(time,C)) + geom_line() +  theme_bw() + scale_color_viridis_d() 
+ggplot(df1, aes(S,C)) + geom_line() +  theme_bw() + scale_color_viridis_d() 
 
 calcPropInteractionsGLVadjMat(A1$interM,A2$STime[,600])
 
+# With no migration 
+yini <- rep(100,times=nrow(A1$interM))
+A1$m <- rep(0.0, 100)
+A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,yini,600,0.1)
+A2$STime[,600]
+df1 <- as.data.frame(t(A2$STime))
+df1$time <- 1:600
+require(tidyr)
+require(ggplot2)
+require(dplyr)
+df1 <- gather(df1,key="Species",value="N", -time)
+ggplot(df1, aes(time,N,colour=Species)) + geom_line() +  theme_bw() + scale_color_viridis_d(guide=FALSE) 
+
+calcPropInteractionsGLVadjMat(A1$interM,A2$STime[,600])
 
 
 #

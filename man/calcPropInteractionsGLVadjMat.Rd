@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{calcPropInteractionsGLVadjMat}
 \alias{calcPropInteractionsGLVadjMat}
-\title{Calculate the proportion of interacions types in a Lotka-Volterra adjacency matrix}
+\title{Calculate the proportion of interactions types in a Lotka-Volterra adjacency matrix}
 \usage{
 calcPropInteractionsGLVadjMat(adjM, spc)
 }
@@ -16,5 +16,5 @@ Numeric vector with 5 elements Matrix 1=Mutualistic (+,+), 2=Predator-prey (-,+)
                   4=Comensalism (+,0), 5=Amensalism (-,0)
 }
 \description{
-Calculate the proportion of interacions types in a Lotka-Volterra adjacency matrix
+Calculate the proportion of interactions types in a Lotka-Volterra adjacency matrix
 }

@@ -79,7 +79,7 @@ metaWebNetAssemblyGLV <- function(metaW, m, r, ini, time, tau = 0.01) {
     .Call(`_meweasmo_metaWebNetAssemblyGLV`, metaW, m, r, ini, time, tau)
 }
 
-#' Calculate the proportion of interacions types in a Lotka-Volterra adjacency matrix
+#' Calculate the proportion of interactions types in a Lotka-Volterra adjacency matrix
 #'
 #' @param adjM       Numeric Matrix Lotka-Volterra adjcency matrix  
 #' @param sp         Numeric vector with the present species, if species=0 the interaction is not counted
@@ -101,7 +101,7 @@ calcPropInteractionsGLVadjMat <- function(adjM, spc) {
 #' @param selfLimMax Numeric vector, and  also set the maximum value for diagonal entries of the interaction matrix
 #'                   that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.
 #' @param migrMin    the minimum value to use as interval to generate at uniform random m from migrMin to 1
-#' @param preserveInt if true the values of the interactions adjM[i,i] when i!=j are preserved, the minimum value to use as interval to generate at uniform random m from migrMin to 1
+#' @param preserveInt if true the values of the interactions adjM[i,i] when i!=j are preserved.
 #'                    
 #' @return           A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
 #' @export
