@@ -80,18 +80,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // generateGLVparmsFromAdj
-List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntMax, NumericVector selfLimMax, double migrMin, bool preserveInt);
-RcppExport SEXP _meweasmo_generateGLVparmsFromAdj(SEXP adjMSEXP, SEXP efSEXP, SEXP predIntMaxSEXP, SEXP selfLimMaxSEXP, SEXP migrMinSEXP, SEXP preserveIntSEXP) {
+List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntAvg, NumericVector selfLimAvg, double migrAvg, int preserveInt);
+RcppExport SEXP _meweasmo_generateGLVparmsFromAdj(SEXP adjMSEXP, SEXP efSEXP, SEXP predIntAvgSEXP, SEXP selfLimAvgSEXP, SEXP migrAvgSEXP, SEXP preserveIntSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type adjM(adjMSEXP);
     Rcpp::traits::input_parameter< double >::type ef(efSEXP);
-    Rcpp::traits::input_parameter< double >::type predIntMax(predIntMaxSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type selfLimMax(selfLimMaxSEXP);
-    Rcpp::traits::input_parameter< double >::type migrMin(migrMinSEXP);
-    Rcpp::traits::input_parameter< bool >::type preserveInt(preserveIntSEXP);
-    rcpp_result_gen = Rcpp::wrap(generateGLVparmsFromAdj(adjM, ef, predIntMax, selfLimMax, migrMin, preserveInt));
+    Rcpp::traits::input_parameter< double >::type predIntAvg(predIntAvgSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type selfLimAvg(selfLimAvgSEXP);
+    Rcpp::traits::input_parameter< double >::type migrAvg(migrAvgSEXP);
+    Rcpp::traits::input_parameter< int >::type preserveInt(preserveIntSEXP);
+    rcpp_result_gen = Rcpp::wrap(generateGLVparmsFromAdj(adjM, ef, predIntAvg, selfLimAvg, migrAvg, preserveInt));
     return rcpp_result_gen;
 END_RCPP
 }

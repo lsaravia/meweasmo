@@ -9,7 +9,7 @@ using namespace Rcpp;
 #define DBG4(MSG,X,XX,Y,Z) 
 
 
-//' Generate random Lotka-Volterra adjacency matrix with fixed proportion of interactions   
+//' Generate random Lotka-Volterra adjacency matrix with a given proportion of interactions (approximately)   
 //'
 //' @param numSp      Integer, number of species 
 //' @param C          Double, Probability of interaction = Connectivity = number of interacions/(numSp^2)

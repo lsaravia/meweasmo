@@ -161,8 +161,11 @@ C <- 4623/(106*106)
 # Generate random GLV matrix
 #
 
-A <- generateRandomGLVadjMat(100,0.001,c(0.3,0.3,0.3,0.05,0.05)) 
+A <- generateRandomGLVadjMat(100,0.01,c(0.3,0.3,0.3,0.05,0.05)) 
 A1 <- generateGLVparmsFromAdj(A,0.01,0.01)
+yini <- rep(10,times=nrow(A1$interM))
+calcPropInteractionsGLVadjMat(A ,yini)
+
 yini <- rep(0,times=nrow(A1$interM))
 A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,yini,600,0.1)
 A2$STime[,600]
@@ -221,7 +224,7 @@ A1 <- generateGLVparmsFromAdj(A,0.1,0.01)
 
 yini <- rep(1,times=nrow(A1$interM))
 
-calcPropInteractionsGLVadjMat(A1$interM,ini)
+calcPropInteractionsGLVadjMat(A1$interM,yini)
 
 A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,yini,100,0.1)
 

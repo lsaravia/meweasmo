@@ -97,19 +97,19 @@ calcPropInteractionsGLVadjMat <- function(adjM, spc) {
 #'                   the parameters of the LV model then a predator prey interaction will be adjM(i,j)=-1 
 #'                   adjM(j,i)=1 where j is the predator and i the prey. Competitive interaction is adjM(i,j)=adjM(j,i)=-1
 #' @param ef         Eficiency of predator prey interactions
-#' @param predIntMax Maximum value for the interaction intensity of predator-preys, competition, mutalistic. 
-#' @param selfLimMax Numeric vector, and  also set the maximum value for diagonal entries of the interaction matrix
+#' @param predIntAvg Average value for the interaction intensity of predator-preys, competition, mutalistic. 
+#' @param selfLimAvg Numeric vector, and  also set the average value for diagonal entries of the interaction matrix
 #'                   that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.
-#' @param migrMin    the minimum value to use as interval to generate at uniform random m from migrMin to 1
-#' @param preserveInt if true the values of the interactions adjM[i,i] when i!=j are preserved.
-#'                    
+#' @param migrAvg    Average value to generate at uniform random migration from [0,migrAvg*2] 
+#' @param preserveInt if 0 the values are random uniform with prdIntAvg as a mean, if 1 the values of the interactions adjM[i,i] when i!=j are preserved.
+#'                    if 2 the values are random uniform with mean given by adjM[i,i] when i!=j.
 #' @return           A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
 #' @export
-generateGLVparmsFromAdj <- function(adjM, ef, predIntMax = 0.01, selfLimMax = as.numeric( c(0.01, 0.01, 0.01)), migrMin = 0.0, preserveInt = FALSE) {
-    .Call(`_meweasmo_generateGLVparmsFromAdj`, adjM, ef, predIntMax, selfLimMax, migrMin, preserveInt)
+generateGLVparmsFromAdj <- function(adjM, ef, predIntAvg = 0.01, selfLimAvg = as.numeric( c(0.01, 0.01, 0.01)), migrAvg = 0.0, preserveInt = 0L) {
+    .Call(`_meweasmo_generateGLVparmsFromAdj`, adjM, ef, predIntAvg, selfLimAvg, migrAvg, preserveInt)
 }
 
-#' Generate random Lotka-Volterra adjacency matrix with fixed proportion of interactions   
+#' Generate random Lotka-Volterra adjacency matrix with a given proportion of interactions (approximately)   
 #'
 #' @param numSp      Integer, number of species 
 #' @param C          Double, Probability of interaction = Connectivity = number of interacions/(numSp^2)

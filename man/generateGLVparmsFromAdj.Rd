@@ -4,9 +4,9 @@
 \alias{generateGLVparmsFromAdj}
 \title{Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix}
 \usage{
-generateGLVparmsFromAdj(adjM, ef, predIntMax = 0.01,
-  selfLimMax = as.numeric(c(0.01, 0.01, 0.01)), migrMin = 0,
-  preserveInt = FALSE)
+generateGLVparmsFromAdj(adjM, ef, predIntAvg = 0.01,
+  selfLimAvg = as.numeric(c(0.01, 0.01, 0.01)), migrAvg = 0,
+  preserveInt = 0L)
 }
 \arguments{
 \item{adjM}{NumericMatrix, metacommunity interaction matrix, the values and the signs are 
@@ -15,14 +15,15 @@ adjM(j,i)=1 where j is the predator and i the prey. Competitive interaction is a
 
 \item{ef}{Eficiency of predator prey interactions}
 
-\item{predIntMax}{Maximum value for the interaction intensity of predator-preys, competition, mutalistic.}
+\item{predIntAvg}{Average value for the interaction intensity of predator-preys, competition, mutalistic.}
 
-\item{selfLimMax}{Numeric vector, and  also set the maximum value for diagonal entries of the interaction matrix
+\item{selfLimAvg}{Numeric vector, and  also set the average value for diagonal entries of the interaction matrix
 that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.}
 
-\item{migrMin}{the minimum value to use as interval to generate at uniform random m from migrMin to 1}
+\item{migrAvg}{Average value to generate at uniform random migration from [0,migrAvg*2]}
 
-\item{preserveInt}{if true the values of the interactions adjM[i,i] when i!=j are preserved.}
+\item{preserveInt}{if 0 the values are random uniform with prdIntAvg as a mean, if 1 the values of the interactions adjM[i,i] when i!=j are preserved.
+if 2 the values are random uniform with mean given by adjM[i,i] when i!=j.}
 }
 \value{
 A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m

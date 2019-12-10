@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{generateRandomGLVadjMat}
 \alias{generateRandomGLVadjMat}
-\title{Generate random Lotka-Volterra adjacency matrix with fixed proportion of interactions}
+\title{Generate random Lotka-Volterra adjacency matrix with a given proportion of interactions (approximately)}
 \usage{
 generateRandomGLVadjMat(numSp, C, propInt)
 }
@@ -19,5 +19,5 @@ represent 1= mutualism (+,+), 2=Predator-prey (+,-), 3= competition (-,-), 4=Com
 A NumericMatrix with the GLV type of adjacency matrix
 }
 \description{
-Generate random Lotka-Volterra adjacency matrix with fixed proportion of interactions
+Generate random Lotka-Volterra adjacency matrix with a given proportion of interactions (approximately)
 }
