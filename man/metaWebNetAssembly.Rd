@@ -4,7 +4,7 @@
 \alias{metaWebNetAssembly}
 \title{Simulation of an Assembly process from a Meta-web assuming the interactions conserve in the local web}
 \usage{
-metaWebNetAssembly(metaW, m, e, time)
+metaWebNetAssembly(metaW, m, e, se, time)
 }
 \arguments{
 \item{metaW}{metacommunity adyacency matrix}
@@ -12,6 +12,8 @@ metaWebNetAssembly(metaW, m, e, time)
 \item{m}{A numeric vector of species' migration rates (probability) from the meta-web}
 
 \item{e}{A numeric vector of species' extinction probability}
+
+\item{se}{A numeric vector of species' secondary extinction probability}
 
 \item{time}{Number of time steps of simulation}
 }

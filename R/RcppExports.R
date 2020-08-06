@@ -55,11 +55,12 @@ cascadeNetAssembly <- function(rho, m, q, a, time, BB = 0L) {
 #' @param metaW  metacommunity adyacency matrix 
 #' @param m      A numeric vector of species' migration rates (probability) from the meta-web   
 #' @param e      A numeric vector of species' extinction probability 
+#' @param se      A numeric vector of species' secondary extinction probability 
 #' @param time   Number of time steps of simulation
 #' @return       A list with the final the number of species by time S, the number of links by time L, 
 #'               the time series of species STime and the adjacency matrix A with effective links. 
-metaWebNetAssembly <- function(metaW, m, e, time) {
-    .Call(`_meweasmo_metaWebNetAssembly`, metaW, m, e, time)
+metaWebNetAssembly <- function(metaW, m, e, se, time) {
+    .Call(`_meweasmo_metaWebNetAssembly`, metaW, m, e, se, time)
 }
 
 #' Simulation of an Assembly process from a Meta-web assuming stochastic Generalized Lotka-Volterra

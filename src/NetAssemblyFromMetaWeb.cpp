@@ -24,11 +24,12 @@ using namespace Rcpp;
 //' @param metaW  metacommunity adyacency matrix 
 //' @param m      A numeric vector of species' migration rates (probability) from the meta-web   
 //' @param e      A numeric vector of species' extinction probability 
+//' @param se      A numeric vector of species' secondary extinction probability 
 //' @param time   Number of time steps of simulation
 //' @return       A list with the final the number of species by time S, the number of links by time L, 
 //'               the time series of species STime and the adjacency matrix A with effective links. 
 // [[Rcpp::export]]
-List metaWebNetAssembly(LogicalMatrix metaW, NumericVector m, NumericVector e, int time) {
+List metaWebNetAssembly(LogicalMatrix metaW, NumericVector m, NumericVector e, NumericVector se, int time) {
 
   if( metaW.ncol()!=metaW.ncol())  
     stop("Matrix metaW have to be square");
@@ -124,13 +125,17 @@ List metaWebNetAssembly(LogicalMatrix metaW, NumericVector m, NumericVector e, i
       for(auto i=0; i<rho; i++ ) {
         if(Spc[i]){
           if(r[i]==0) {
-            if(!Bas[i]){                // if it is not basal secondary exctinction
-              DBG("EXTINCION SECUNDARIA i ",i)
-              for( auto j=0; j<rho; j++) {   // Delete row i (predators), column i (preys) is already 0
-                A(i,j)=false; // j-->i
+            if(!Bas[i]){ 
+              // if it is not basal secondary exctinction
+              auto rnd = runif(1)[0];
+                if(rnd < se[i]) {
+                DBG("EXTINCION SECUNDARIA i ",i)
+                for( auto j=0; j<rho; j++) {   // Delete row i (predators), column i (preys) is already 0
+                  A(i,j)=false; // j-->i
+                }
+                noSecondary=true;
+                Spc[i]=false;
               }
-              noSecondary=true;
-              Spc[i]=false;
             }
           }
         }

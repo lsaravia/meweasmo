@@ -282,6 +282,11 @@ A <- A2$A[d,d]
 sum(d)
 sum(A)
 
+A <- matrix(c(0,   1,     1,    0,
+              1,   0,     1,    0,
+              1,   1,     0,    -1,
+              0,   0,     -1,    0),nrow = 4,byrow=TRUE)
+
 #A1$m <- c(0,0,0)
 ini <- c(100,100,100,100)
 #NumericMatrix metaW,NumericVector m, NumericVector r, NumericVector ini, int time, double tau=0.01)
@@ -295,4 +300,17 @@ A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,ini,200,0.1)
 A2$STime
 
 
-*/
+# Generate a mutualistic / Predator-prey network   
+A <- generateRandomGLVadjMat(100,0.5,c(0.2,0.2,0.2,0.2,0.2)) 
+A <- generateRandomGLVadjMat(100,0.5,c(1,0.2,0.2,0.2,0.2)) 
+
+A
+A1 <- generateGLVparmsFromAdj(A,0.1,0.001,selfLimAvg=c(0.01,0.01,0.001),preserveInt = 0, migrAvg = 0.2)
+ini <- rep(0.0,100)
+A2 <- metaWebNetAssemblyGLV(A1$interM,A1$m,A1$r,ini,200,0.1)
+A2$STime[,200]
+
+DG <-A1$interM
+diag(DG) <- 0
+mean( abs(DG[DG!=0] ))
+  */
