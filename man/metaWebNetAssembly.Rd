@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{metaWebNetAssembly}
 \alias{metaWebNetAssembly}
-\title{Simulation of an Assembly process from a Meta-web assuming the interactions conserve in the local web}
+\title{Simulation of an Assembly process from a Meta-web assuming the interactions are conserved in the local web}
 \usage{
 metaWebNetAssembly(metaW, m, e, se, time)
 }
@@ -23,7 +23,9 @@ A list with the final the number of species by time S, the number of links by ti
 }
 \description{
 This is a dynamical model of colonization and extinction process, with the restriction 
-that predators must have at least one prey species to survive in the local community,  described in [1]
+that predators must have at least one prey species to survive in the local community,  described in [1] 
+With an additional secondary extinctions probability that controls when a predator goes extinct if it has
+no prey.
 }
 \references{
 1. Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux, S., Cazelles, K., et al. (2018). 

@@ -11,10 +11,12 @@ using namespace Rcpp;
 
 
 
-//' Simulation of an Assembly process from a Meta-web assuming the interactions conserve in the local web 
+//' Simulation of an Assembly process from a Meta-web assuming the interactions are conserved in the local web 
 //'
 //' This is a dynamical model of colonization and extinction process, with the restriction 
-//' that predators must have at least one prey species to survive in the local community,  described in [1]
+//' that predators must have at least one prey species to survive in the local community,  described in [1] 
+//' With an additional secondary extinctions probability that controls when a predator goes extinct if it has
+//' no prey.
 //' 
 //' @references
 //' 
