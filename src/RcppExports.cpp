@@ -52,6 +52,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// metaWebNetAssemblyCT
+List metaWebNetAssemblyCT(LogicalMatrix metaW, NumericVector m, NumericVector e, NumericVector se, int time);
+RcppExport SEXP _meweasmo_metaWebNetAssemblyCT(SEXP metaWSEXP, SEXP mSEXP, SEXP eSEXP, SEXP seSEXP, SEXP timeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< LogicalMatrix >::type metaW(metaWSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type m(mSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type e(eSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type se(seSEXP);
+    Rcpp::traits::input_parameter< int >::type time(timeSEXP);
+    rcpp_result_gen = Rcpp::wrap(metaWebNetAssemblyCT(metaW, m, e, se, time));
+    return rcpp_result_gen;
+END_RCPP
+}
 // metaWebNetAssemblyGLV
 List metaWebNetAssemblyGLV(NumericMatrix metaW, NumericVector m, NumericVector r, NumericVector ini, int time, double tau);
 RcppExport SEXP _meweasmo_metaWebNetAssemblyGLV(SEXP metaWSEXP, SEXP mSEXP, SEXP rSEXP, SEXP iniSEXP, SEXP timeSEXP, SEXP tauSEXP) {
@@ -114,6 +129,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_meweasmo_neutralNetAssembly", (DL_FUNC) &_meweasmo_neutralNetAssembly, 6},
     {"_meweasmo_cascadeNetAssembly", (DL_FUNC) &_meweasmo_cascadeNetAssembly, 6},
     {"_meweasmo_metaWebNetAssembly", (DL_FUNC) &_meweasmo_metaWebNetAssembly, 5},
+    {"_meweasmo_metaWebNetAssemblyCT", (DL_FUNC) &_meweasmo_metaWebNetAssemblyCT, 5},
     {"_meweasmo_metaWebNetAssemblyGLV", (DL_FUNC) &_meweasmo_metaWebNetAssemblyGLV, 6},
     {"_meweasmo_calcPropInteractionsGLVadjMat", (DL_FUNC) &_meweasmo_calcPropInteractionsGLVadjMat, 2},
     {"_meweasmo_generateGLVparmsFromAdj", (DL_FUNC) &_meweasmo_generateGLVparmsFromAdj, 6},

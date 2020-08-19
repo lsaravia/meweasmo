@@ -65,6 +65,32 @@ metaWebNetAssembly <- function(metaW, m, e, se, time) {
     .Call(`_meweasmo_metaWebNetAssembly`, metaW, m, e, se, time)
 }
 
+#' Simulation of an Assembly process from a Meta-web assuming the interactions are conserved in the local web 
+#'
+#' This is a dynamical model of colonization and extinction process, with the restriction 
+#' that predators must have at least one prey species to survive in the local community, described in [1]. 
+#' With an additional secondary extinctions probability that controls when a predator goes extinct if it has
+#' no prey. This is a continuous time version of the model that follows the Gillespie algorithm [2] for simulation 
+#' 
+#' @references
+#' 
+#' 1. Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux, S., Cazelles, K., et al. (2018). 
+#' The spatial scaling of species interaction networks. Nat. Ecol. Evol., 2, 782–790
+#' 2. Gillespie, D. T. (1976). A general method for numerically simulating the stochastic time evolution of coupled chemical reactions. 
+#' Journal of Computational Physics, 22(4), 403–434. doi: 10.1016/0021-9991(76)90041-3
+#' 
+#'
+#' @param metaW  metacommunity adyacency matrix 
+#' @param m      A numeric vector of species' migration rates (probability) from the meta-web   
+#' @param e      A numeric vector of species' extinction probability 
+#' @param se      A numeric vector of species' secondary extinction probability 
+#' @param time   Number of time steps of simulation
+#' @return       A list with the final the number of species by time S, the number of links by time L, 
+#'               the time series of species STime and the adjacency matrix A with effective links. 
+metaWebNetAssemblyCT <- function(metaW, m, e, se, time) {
+    .Call(`_meweasmo_metaWebNetAssemblyCT`, metaW, m, e, se, time)
+}
+
 #' Simulation of an Assembly process from a Meta-web assuming stochastic Generalized Lotka-Volterra
 #' Local dynamics  
 #'

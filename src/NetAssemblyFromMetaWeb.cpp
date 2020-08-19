@@ -3,9 +3,9 @@
 
 using namespace Rcpp;
 
-//#define DBG(MSG,X) Rcpp::Rcout << MSG << X << std::endl;
-//#define DBG3(MSG,X,Y,Z) Rcpp::Rcout << MSG << X << "\t" << Y << "\t" << Z << std::endl;
-#define DBG(MSG,X) 
+// #define DBG(MSG,X) Rcpp::Rcout << MSG << X << std::endl;
+// #define DBG3(MSG,X,Y,Z) Rcpp::Rcout << MSG << X << "\t" << Y << "\t" << Z << std::endl;
+#define DBG(MSG,X)
 #define DBG3(MSG,X,Y,Z)
 
 
@@ -167,6 +167,185 @@ List metaWebNetAssembly(LogicalMatrix metaW, NumericVector m, NumericVector e, N
 }
 
 
+//' Simulation of an Assembly process from a Meta-web assuming the interactions are conserved in the local web 
+//'
+//' This is a dynamical model of colonization and extinction process, with the restriction 
+//' that predators must have at least one prey species to survive in the local community, described in [1]. 
+//' With an additional secondary extinctions probability that controls when a predator goes extinct if it has
+//' no prey. This is a continuous time version of the model that follows the Gillespie algorithm [2] for simulation 
+//' 
+//' @references
+//' 
+//' 1. Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux, S., Cazelles, K., et al. (2018). 
+//' The spatial scaling of species interaction networks. Nat. Ecol. Evol., 2, 782–790
+//' 2. Gillespie, D. T. (1976). A general method for numerically simulating the stochastic time evolution of coupled chemical reactions. 
+//' Journal of Computational Physics, 22(4), 403–434. doi: 10.1016/0021-9991(76)90041-3
+//' 
+//'
+//' @param metaW  metacommunity adyacency matrix 
+//' @param m      A numeric vector of species' migration rates (probability) from the meta-web   
+//' @param e      A numeric vector of species' extinction probability 
+//' @param se      A numeric vector of species' secondary extinction probability 
+//' @param time   Number of time steps of simulation
+//' @return       A list with the final the number of species by time S, the number of links by time L, 
+//'               the time series of species STime and the adjacency matrix A with effective links. 
+// [[Rcpp::export]]
+List metaWebNetAssemblyCT(LogicalMatrix metaW, NumericVector m, NumericVector e, NumericVector se, int time) {
+  
+  if( metaW.ncol()!=metaW.ncol())  
+    stop("Matrix metaW have to be square");
+  
+  IntegerVector SL(time);      // Species with links vector, the total number of species could be bigger. 
+  IntegerVector LL(time);
+  
+  auto rho = metaW.nrow();     // meta web should be a square matrix
+  if(m.length()!=rho)
+    stop("migration vector m must have the same elements that the dimensions of metaW");  
+  if(e.length()!=rho)
+    stop("extinction vector e must have the same elements that the dimensions of metaW");  
+  
+  LogicalMatrix A(rho,rho);   // Local adyacency matrix
+  LogicalVector Spc(rho);     // Vector of present species
+  LogicalVector Bas(rho);     // Vector of basal species
+  NumericVector lambda(rho);   // Vector of scaled transition rate 
+  NumericVector lambda_se(rho);   // Vector of scaled transition rate 
+  NumericVector lambda_e(rho);   // Vector of scaled transition rate 
+  IntegerMatrix ST(rho,time); // Vector of species populations in time
+  unsigned long L=0;
+  double totR = 0;
+  
+  // Detect Basal species
+  // Build cumulative probabilities
+  //
+  auto r=colSums(metaW);
+  for(auto s=0; s<rho; s++){
+    if(r[s]==0)
+      Bas[s]=true;
+    totR += m[s] + e[s] + se[s];
+    lambda[s] = totR;
+    lambda_se[s] = lambda[s] - se[s];
+    lambda_e[s] = lambda_se[s] - e[s];
+  }
+  lambda = lambda / totR;
+  lambda_se = lambda_se / totR;
+  lambda_e = lambda_e / totR;  
+  
+  //
+  //   0 --> lambda_e[0] --> lambda_se[0] --> lambda[0] ---> lambda_e[1] --> lambda_se[1] --> lambda[1]=1
+  //      |-> m[0]        |-> e[0]         |-> se[0]
+  
+  DBG("Basales : ",Bas)
+  DBG("TotR    : ",totR)
+  DBG("lambda    : ",lambda)
+  DBG("lambda_se : ",lambda_se)
+  DBG("lambda_e  : ",lambda_e)
+    
+  // Continuous time 
+  //
+  double T = 0;
+  
+  for(auto t=1; t<time; ){
+
+    DBG("\n============ t: ",t)
+    DBG("============ T: ",T)
+    DBG("Spc:",Spc)
+    
+    
+    // Add Species m*(rho-S)
+    //
+    auto rnd=runif(1)[0];  
+    DBG("\nrandom: ",rnd)
+
+    for(auto s=0; s<rho; ){
+      if(rnd<lambda[s]){
+        DBG("\nSpecie: ",s)
+        
+        if(rnd >= lambda_se[s]) { 
+          // Secondary extinction
+          DBG("\nlambda_se: ", lambda_se[s])
+          
+          if(!Bas[s] && Spc[s]){ 
+            // if it is not basal secondary exctinction
+            //
+            auto colsum = 0;
+            for( auto j=0; j<rho; j++) {   // If the column sum is 0 no preys 
+              colsum += A(j,s);
+            }
+            if( colsum == 0) {  
+              DBG("EXTINCION SECUNDARIA s ",s)
+              for( auto j=0; j<rho; j++) {   // Delete row i (predators), column i (preys) is already 0
+                  A(s,j)=false; // j-->i
+              }
+              Spc[s]=false;
+            }
+          }
+        }
+        else if(rnd >= lambda_e[s]) {
+          DBG("\nlambda_e: ", lambda_e[s])
+          // Extinction 
+          // if species i extinct all column of interactions is deleted
+          if( Spc[s]){
+            for( auto j=0; j<rho; j++) {   
+              A(j,s)=false; // j-->i
+            }
+            // if species i extinct all row of interactions is deleted
+            for( auto j=0; j<rho; j++) {   
+              A(s,j)=false; // j-->i
+            }
+            Spc[s]=false;             // extinction
+            DBG("EXTINCION s ",s)
+              
+          }
+        } 
+        else {
+          DBG("\nMigration s: ", s)
+          // Migration
+          //
+          Spc[s]=true;             
+          for( auto j=0; j<rho; j++) { 
+            if( Spc[s] && Spc[j] ) {
+              if( metaW(j,s) ){
+                A(j,s)=true; // s<--j  Predator
+              }
+              if( metaW(s,j) ){
+                A(s,j)=true; // s-->j  Prey
+              }
+            }
+          }
+        }
+        break;
+      } else s++;
+    }
+    
+    // Update number of species
+    // Update time as an exponential distribution totR
+
+    auto deltaT = -log(runif(1)[0])/totR;
+    T += deltaT;
+    if(T>=t)  {
+      DBG3("\nT > t ", T, " >= ", t)
+      DBG("Interactions A: \n",A)
+      L = sum(A);
+      SL[t] = sum((colSums(A)>0)+(rowSums(A)>0)>0); // Active links
+      ST(_,t) = Spc;
+      
+      DBG("L :", L)
+      DBG("St:",SL[t])
+      DBG("Spc:",Spc)
+      DBG("Basal:",Bas)
+      LL[t]=L;  
+      t++;
+    }
+  }
+    
+  return List::create(Named("S") = SL,
+                      Named("L") = LL,
+                      Named("STime") = ST,
+                      Named("A") = A);
+
+}
+
+
 /*** R
 
 A <- matrix(c(c(0,1,1,1,0),c(0,0,1,0,1),c(0,0,0,0,0),c(0,0,1,0,0),c(0,0,0,1,0)),nrow = 5,byrow=TRUE)
@@ -176,14 +355,22 @@ A <- matrix(c(c(0,1,1,1,0),c(0,0,1,0,1),c(0,0,0,0,0),c(0,0,1,0,0),c(0,0,0,1,0)),
 #
 # If m=0 no species 
 #
-ee <- rep(.1,5)
-mm <- c(.3,.3,.3,1,1.0)
+mm <- rep(1,5) #c(0.2,0.2,0.2,.2,.2)
+ee <- rep(0.6, 5)
+se <- rep(1, 5)
 set.seed(123)
 
-A0 <- metaWebNetAssembly(A,mm,ee,10)
+# A0 <- metaWebNetAssembly(A,mm,ee,se,10)
+# A0
+# A0$L[10]==1
+# A0$S[10]==2
+
+A0 <- metaWebNetAssemblyCT(A,mm,ee,se,4)
 A0
 A0$L[10]==1
 A0$S[10]==2
+
+
 # set.seed(123)
 # A1 <- metaWebNetAssembly(A,mm,ee,1000)
 # any(A1$L!=A0$L)

@@ -6,9 +6,12 @@
 [![DOI](https://zenodo.org/badge/130283899.svg)](https://zenodo.org/badge/latestdoi/130283899)
 
 This package simulates the assembly of ecological networks from a
-regional metaweb. It uses a generalized Lotka-Volterra stochastic model.
-Species can migrate from the meta-web and establish the ecological
-interactions specified in the metaweb.
+regional metaweb. Two main models are implemented; first the trophic
+theory of island biogeography \[2\] with the adition that secondary
+extinctions are not fixed but happen with a defined probability. Second
+a generalized Lotka-Volterra stochastic model. Species can migrate from
+the metaweb and establish the ecological interactions specified in the
+metaweb.
 
 License: MIT
 
@@ -24,7 +27,7 @@ install_github('lsaravia/meweasmo')
 library(meweasmo)
 ```
 
-## Get Started
+## Get Started with Generalized Lotka-volterra model
 
 ### Simulate a 6 species network without migration
 
@@ -93,7 +96,7 @@ A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 ``` r
 
 A1$STime[,1000]
-#> [1] 368 144 702 128  34 242
+#> [1] 368 125 555 122  21 284
 
 calcPropInteractionsGLVadjMat(A,A1$STime[,1000])
 #> [1] 0.2 0.6 0.0 0.1 0.1
@@ -124,3 +127,8 @@ ggplot(df1, aes(time,N,colour=Species)) + geom_point(size=0.1) +  theme_bw() + s
     local food webs Leonardo A. Saravia, Tomás I. Marina, Marleen De
     Troch, Fernando R. Momo bioRxiv 340430; doi:
     <https://doi.org/10.1101/340430>
+
+2.  Gravel, D., Massol, F., Canard, E., Mouillot, D., & Mouquet, N.
+    (2011). Trophic theory of island biogeography. Ecology Letters,
+    14(10), 1010–1016.
+    <https://doi.org/10.1111/j.1461-0248.2011.01667.x>
