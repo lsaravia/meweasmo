@@ -4,9 +4,14 @@
 \alias{generateGLVparmsFromAdj}
 \title{Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix}
 \usage{
-generateGLVparmsFromAdj(adjM, ef, predIntAvg = 0.01,
-  selfLimAvg = as.numeric(c(0.01, 0.01, 0.01)), migrAvg = 0,
-  preserveInt = 0L)
+generateGLVparmsFromAdj(
+  adjM,
+  ef,
+  predIntAvg = 0.01,
+  selfLimAvg = as.numeric(c(0.01, 0.01, 0.01)),
+  migrAvg = 0,
+  preserveInt = 0L
+)
 }
 \arguments{
 \item{adjM}{NumericMatrix, metacommunity interaction matrix, the values and the signs are 

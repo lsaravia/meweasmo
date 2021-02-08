@@ -22,10 +22,11 @@ A list with the final the number of species by time S, the number of links by ti
               the time series of species STime and the adjacency matrix A with effective links.
 }
 \description{
-This is a dynamical model of colonization and extinction process, with the restriction 
-that predators must have at least one prey species to survive in the local community, described in [1]. 
+This is a dynamical model of colonization and extinction process, similar to the TTIB model described in [1]. 
 With an additional secondary extinctions probability that controls when a predator goes extinct if it has
 no prey. This is a continuous time version of the model that follows the Gillespie algorithm [2] for simulation
+There are 3 possible events migration with rate *m*, local extinction with rate *e*, and secondary extinction when
+a predators has no prey with rate *se*. The parameters are vectors so each species could have their own parameter values.
 }
 \references{
 1. Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux, S., Cazelles, K., et al. (2018). 

@@ -3,7 +3,6 @@
 \docType{package}
 \name{meweasmo}
 \alias{meweasmo}
-\alias{meweasmo-package}
 \title{meweasmo: A package for simulation of ecological network assembly}
 \description{
 The meweasmo package provides stochastic models to simulate the assembly of ecological

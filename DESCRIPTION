@@ -9,7 +9,7 @@ Description: Simulate Network Assembly processes
 License: MIT + file LICENSE
 Imports: Rcpp (>= 0.12.16)
 LinkingTo: Rcpp
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 URL: https://github.com/lsaravia/meweasmo
 BugReports: https://github.com/lsaravia/meweasmo/issues
 Suggests: testthat
