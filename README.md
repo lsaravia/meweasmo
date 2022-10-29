@@ -7,7 +7,7 @@
 
 This package simulates the assembly of ecological networks from a
 regional metaweb. Two main models are implemented; first the trophic
-theory of island biogeography \[2\] with the adition that secondary
+theory of island biogeography \[2\] with the addition that secondary
 extinctions are not fixed but happen with a defined probability. Second
 a generalized Lotka-Volterra stochastic model. Species can migrate from
 the metaweb and establish the ecological interactions specified in the
@@ -31,10 +31,8 @@ library(meweasmo)
 
 ### Simulate a 6 species network without migration
 
-  - Create a metaweb with a Lotka-Volterra interaction matrix structure,
+-   Create a metaweb with a Lotka-Volterra interaction matrix structure,
     I added one last column with intrinsic growth rate.
-
-<!-- end list -->
 
 ``` r
 
@@ -51,10 +49,8 @@ parms <- tibble::tribble(
 )
 ```
 
-  - Set the initial conditions and simulate the model with no migration
+-   Set the initial conditions and simulate the model with no migration
     during 1000 time steps
-
-<!-- end list -->
 
 ``` r
 
@@ -67,11 +63,9 @@ r<- as.numeric(parms$r)
 m <- c(0,0,0,0,0,0)
 ```
 
-  - We can calculate the proportions of the different types of
+-   We can calculate the proportions of the different types of
     interactions using the metaweb matrix and the vector of species
     present, in this case all species
-
-<!-- end list -->
 
 ``` r
 
@@ -79,32 +73,26 @@ calcPropInteractionsGLVadjMat(A,yini)
 #> [1] 0.2 0.6 0.0 0.1 0.1
 ```
 
-  - then run de simultation
-
-<!-- end list -->
+-   then run de simultation
 
 ``` r
 
 A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 ```
 
-  - Check the results of the simulation: the abundances and the
+-   Check the results of the simulation: the abundances and the
     proportion of interactions, at the last time step
-
-<!-- end list -->
 
 ``` r
 
 A1$STime[,1000]
-#> [1] 368 125 555 122  21 284
+#> [1]  329  305 1003  165   82  532
 
 calcPropInteractionsGLVadjMat(A,A1$STime[,1000])
 #> [1] 0.2 0.6 0.0 0.1 0.1
 ```
 
-  - Plot the time series of the species
-
-<!-- end list -->
+-   Plot the time series of the species
 
 ``` r
 
@@ -123,10 +111,10 @@ ggplot(df1, aes(time,N,colour=Species)) + geom_point(size=0.1) +  theme_bw() + s
 
 ## References
 
-1.  Ecological Network assembly: how the regional metaweb influences
-    local food webs Leonardo A. Saravia, Tomás I. Marina, Marleen De
-    Troch, Fernando R. Momo bioRxiv 340430; doi:
-    <https://doi.org/10.1101/340430>
+1.  Saravia, L. A., Marina, T. I., Kristensen, N. P., De Troch, M., &
+    Momo, F. R. (2022). Ecological network assembly: How the regional
+    metaweb influences local food webs. Journal of Animal Ecology,
+    91(3), 630–642. <https://doi.org/10.1111/1365-2656.13652>
 
 2.  Gravel, D., Massol, F., Canard, E., Mouillot, D., & Mouquet, N.
     (2011). Trophic theory of island biogeography. Ecology Letters,

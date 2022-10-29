@@ -1,7 +1,7 @@
 Package: meweasmo
 Type: Package
 Title: Simulation of metaweb assembly models
-Version: 0.1.5.9000
+Version: 0.1.6
 Date: 2018-03-28
 Authors@R: c(person("Leonardo A.", "Saravia", email = "lsaravia@campus.ungs.edu.ar", role ="cre"))
 Maintainer: Leonardo Saravia <lsaravia@campus.ungs.edu.ar>
@@ -9,7 +9,7 @@ Description: Simulate Network Assembly processes
 License: MIT + file LICENSE
 Imports: Rcpp (>= 0.12.16)
 LinkingTo: Rcpp
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.1
 URL: https://github.com/lsaravia/meweasmo
 BugReports: https://github.com/lsaravia/meweasmo/issues
 Suggests: testthat

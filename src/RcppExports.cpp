@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // neutralNetAssembly
 List neutralNetAssembly(double rho, double m, double q, double a, int time, int BB);
 RcppExport SEXP _meweasmo_neutralNetAssembly(SEXP rhoSEXP, SEXP mSEXP, SEXP qSEXP, SEXP aSEXP, SEXP timeSEXP, SEXP BBSEXP) {

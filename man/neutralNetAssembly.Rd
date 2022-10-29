@@ -19,9 +19,6 @@ neutralNetAssembly(rho, m, q, a, time, BB = 0L)
 
 \item{BB}{number of initial basal species present}
 }
-\value{
-
-}
 \description{
 This model simulates an assembly process starting from basal species, that could be fixed with the 
   parameter BB or allowed to migrate with rate m. The interactions are established with probability q with 

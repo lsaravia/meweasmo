@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 [![DOI](https://zenodo.org/badge/130283899.svg)](https://zenodo.org/badge/latestdoi/130283899)
 
-This package simulates the assembly of ecological networks from a regional metaweb. Two main models are implemented;  first the trophic theory of island biogeography [2] with the adition that secondary extinctions are not fixed but happen with a defined probability.  Second a generalized Lotka-Volterra stochastic model. Species can migrate from the metaweb and establish the ecological interactions specified in the metaweb.
+This package simulates the assembly of ecological networks from a regional metaweb. Two main models are implemented; first the trophic theory of island biogeography [2] with the addition that secondary extinctions are not fixed but happen with a defined probability. Second a generalized Lotka-Volterra stochastic model. Species can migrate from the metaweb and establish the ecological interactions specified in the metaweb.
 
 License: MIT
 
@@ -118,9 +118,7 @@ ggplot(df1, aes(time,N,colour=Species)) + geom_point(size=0.1) +  theme_bw() + s
 ## References
 
 
-1. Ecological Network assembly: how the regional metaweb influences local food webs
-Leonardo A. Saravia, Tomás I. Marina, Marleen De Troch, Fernando R. Momo
-bioRxiv 340430; doi: https://doi.org/10.1101/340430
+1. Saravia, L. A., Marina, T. I., Kristensen, N. P., De Troch, M., & Momo, F. R. (2022). Ecological network assembly: How the regional metaweb influences local food webs. Journal of Animal Ecology, 91(3), 630–642. https://doi.org/10.1111/1365-2656.13652
 
 2. Gravel, D., Massol, F., Canard, E., Mouillot, D., & Mouquet, N. (2011). Trophic theory of island biogeography. Ecology Letters, 14(10), 1010–1016. https://doi.org/10.1111/j.1461-0248.2011.01667.x
 

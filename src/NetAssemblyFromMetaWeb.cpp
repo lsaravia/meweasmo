@@ -169,17 +169,19 @@ List metaWebNetAssembly(LogicalMatrix metaW, NumericVector m, NumericVector e, N
 
 //' Simulation of an Assembly process from a Meta-web assuming the interactions are conserved in the local web 
 //'
-//' This is a dynamical model of colonization and extinction process, similar to the TTIB model described in [1]. 
+//' This is a dynamical model of colonization and extinction process [1], similar to the TTIB model described in [2]. 
 //' With an additional secondary extinctions probability that controls when a predator goes extinct if it has
-//' no prey. This is a continuous time version of the model that follows the Gillespie algorithm [2] for simulation
+//' no prey. This is a continuous time version of the model that follows the Gillespie algorithm [3] for simulation
 //' There are 3 possible events migration with rate *m*, local extinction with rate *e*, and secondary extinction when
 //' a predators has no prey with rate *se*. The parameters are vectors so each species could have their own parameter values.
 //' 
 //' @references
 //' 
-//' 1. Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux, S., Cazelles, K., et al. (2018). 
+//' 1. Saravia, L. A., Marina, T. I., Kristensen, N. P., De Troch, M., & Momo, F. R. (2022). Ecological network assembly: 
+//' How the regional metaweb influences local food webs. Journal of Animal Ecology, 91(3), 630–642. https://doi.org/10.1111/1365-2656.13652
+//' 2. Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux, S., Cazelles, K., et al. (2018). 
 //' The spatial scaling of species interaction networks. Nat. Ecol. Evol., 2, 782–790
-//' 2. Gillespie, D. T. (1976). A general method for numerically simulating the stochastic time evolution of coupled chemical reactions. 
+//' 3. Gillespie, D. T. (1976). A general method for numerically simulating the stochastic time evolution of coupled chemical reactions. 
 //' Journal of Computational Physics, 22(4), 403–434. doi: 10.1016/0021-9991(76)90041-3
 //' 
 //'
