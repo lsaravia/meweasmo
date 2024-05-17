@@ -10,7 +10,9 @@ generateGLVparmsFromAdj(
   predIntAvg = 0.01,
   selfLimAvg = as.numeric(c(0.01, 0.01, 0.01)),
   migrAvg = 0,
-  preserveInt = 0L
+  preserveInt = 0L,
+  predIntSd = 0.01,
+  rndType = 0L
 )
 }
 \arguments{
@@ -25,10 +27,15 @@ adjM(j,i)=1 where j is the predator and i the prey. Competitive interaction is a
 \item{selfLimAvg}{Numeric vector, and  also set the average value for diagonal entries of the interaction matrix
 that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.}
 
-\item{migrAvg}{Average value to generate at uniform random migration from [0,migrAvg*2]}
+\item{migrAvg}{Average value to generate a uniform random migration with range [0,migrAvg*2]}
 
-\item{preserveInt}{if 0 the values are random uniform with prdIntAvg as a mean, if 1 the values of the interactions adjM[i,i] when i!=j are preserved.
+\item{preserveInt}{if 0 the values are random defined by `rndType` with `predIntAvg` as a mean, if 1 the values of the interactions adjM[i,i] when i!=j are preserved.
 if 2 the values are random uniform with mean given by adjM[i,i] when i!=j.}
+
+\item{predIntSd}{Standard deviation of the distribution to generate the interaction values for `preserveInt = 0` and `rndType = 1` gamma distribution.
+For uniform distribution the sd is fixed at `predIntAvg*2 / sqrt(12)`}
+
+\item{rndType}{0=uniform, 1=gamma NOTE: this is implemented only for `preserveInt = 0`}
 }
 \value{
 A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m

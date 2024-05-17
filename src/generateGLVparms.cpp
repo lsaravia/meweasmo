@@ -18,14 +18,18 @@ using namespace Rcpp;
 //' @param predIntAvg Average value for the interaction intensity of predator-preys, competition, mutalistic. 
 //' @param selfLimAvg Numeric vector, and  also set the average value for diagonal entries of the interaction matrix
 //'                   that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.
-//' @param migrAvg    Average value to generate at uniform random migration from [0,migrAvg*2] 
-//' @param preserveInt if 0 the values are random uniform with prdIntAvg as a mean, if 1 the values of the interactions adjM[i,i] when i!=j are preserved.
+//' @param migrAvg    Average value to generate a uniform random migration with range [0,migrAvg*2] 
+//' @param preserveInt if 0 the values are random defined by `rndType` with `predIntAvg` as a mean, if 1 the values of the interactions adjM[i,i] when i!=j are preserved.
 //'                    if 2 the values are random uniform with mean given by adjM[i,i] when i!=j.
+//' @param predIntSd  Standard deviation of the distribution to generate the interaction values for `preserveInt = 0` and `rndType = 1` gamma distribution.
+//'                   For uniform distribution the sd is fixed at `predIntAvg*2 / sqrt(12)`
+//' @param rndType    0=uniform, 1=gamma NOTE: this is implemented only for `preserveInt = 0`
+//'                                   
 //' @return           A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
 //' @export
 // [[Rcpp::export]]
 List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntAvg=0.01, NumericVector selfLimAvg = NumericVector::create(0.01, 0.01, 0.01),
-                             double migrAvg=0.0, int preserveInt=0) {
+                             double migrAvg=0.0, int preserveInt=0, double predIntSd=0.01, int rndType=0) {
   
   auto rho = adjM.nrow();     // meta web should be a square matrix
   
@@ -39,9 +43,25 @@ List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntAvg=0.
   std::fill(Bas.begin(), Bas.end(), true);
   std::fill(Mut.begin(), Mut.end(), false);
   
-  DBG("Basales: \n",Bas)
-  DBG("A: \n",A)
-  DBG("adjM: \n", adjM)    
+  auto a_predInt = 0.0, b_predInt = 0.0, shape = 0.0, rate = 0.0;
+  if(rndType==0) {
+    // Uniform distribution
+    //
+    // Parameters a and b, sd fixed at predIntAvg*2/sqrt(12)
+    a_predInt = 0.0;
+    b_predInt = predIntAvg * 2;
+  } else if(rndType==1) {
+    // Gamma distribution
+    //
+    DBG("Gamma: \n",rndType)
+    shape = pow(predIntAvg/predIntSd,2);
+    rate  = pow(predIntSd,2)/predIntAvg;   // This  the scale parameter
+  }
+    
+  //DBG("Basales: \n",Bas)
+  //DBG("A: \n",A)
+  //DBG("adjM: \n", adjM)    
+  
   // Fill adyacency matrix A and number of species SL
   //
   A.fill_diag(true);
@@ -54,42 +74,72 @@ List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntAvg=0.
           if(adjM(i,j)<0 && adjM(j,i)>0) {  // j is the predator i is the prey
             
             A(i,j)=A(j,i)=true;
-            adjM(i,j)=-runif(1,0,predIntAvg*2)[0];         // Random uniform number
+            if(rndType==0)
+              adjM(i,j)=-runif(1,a_predInt,b_predInt)[0];         // Random uniform number
+            else if(rndType==1)
+            {
+              adjM(i,j)=-rgamma(1,shape,rate)[0];         // Random gamma number
+              DBG("\t", adjM(i,j))
+            }
             adjM(j,i)= ef*-adjM(i,j);
             Bas[j]=false;                                 // Predators are not basal
-            DBG("Predator-Prey ", adjM(i,j))    
+            //DBG("Predator-Prey ", adjM(i,j))    
               
           } else if(adjM(i,j)<0 && adjM(j,i)<0) { // Competition
   
             A(i,j)=A(j,i)=true;
-            adjM(i,j)=-runif(1,0,predIntAvg*2)[0];
-            adjM(j,i)=-runif(1,0,predIntAvg*2)[0];
-            DBG("Competition ", adjM(i,j))    
+            if(rndType==0) {
+              adjM(i,j)=-runif(1,a_predInt,b_predInt)[0];         // Random uniform number
+              adjM(j,i)=-runif(1,a_predInt,b_predInt)[0];         // Random uniform number
+            } else if(rndType==1) {
+              adjM(i,j)=-rgamma(1,shape,rate)[0];         // Random gamma number
+              adjM(j,i)=-rgamma(1,shape,rate)[0];         // Random gamma number
+              DBG("\t", adjM(j,i))
+              DBG("\t", adjM(i,j))
+            }
+            //DBG("Competition ", adjM(i,j))    
               
           } else if( adjM(i,j)>0 && adjM(j,i)>0 ){        // Mutualism
             
             A(i,j)=A(j,i)=true;
-            adjM(i,j)=runif(1,0,predIntAvg*2)[0];
-            adjM(j,i)=runif(1,0,predIntAvg*2)[0];
-            DBG("Mutualism ", adjM(i,j))   
+            if(rndType==0) {
+              adjM(i,j)=runif(1,a_predInt,b_predInt)[0];         // Random uniform number
+              adjM(j,i)=runif(1,a_predInt,b_predInt)[0];         // Random uniform number
+            } else if(rndType==1) {
+              adjM(i,j)=rgamma(1,shape,rate)[0];         // Random gamma number
+              adjM(j,i)=rgamma(1,shape,rate)[0];         // Random gamma number
+              DBG("\t", adjM(j,i))
+              DBG("\t", adjM(i,j))
+            }
+            //DBG("Mutualism ", adjM(i,j))   
             Mut[j]=Mut[i]=true;
               
           } else if( adjM(i,j)>0 && adjM(j,i)==0 ){    // Comensalism
             
             A(i,j)=true;
-            adjM(i,j)=runif(1,0,predIntAvg*2)[0];
+            if(rndType==0)
+              adjM(i,j)=runif(1,a_predInt,b_predInt)[0];         // Random uniform number
+            else if(rndType==1) {
+              adjM(i,j)=rgamma(1,shape,rate)[0];         // Random gamma number
+              DBG("\t", adjM(i,j))
+            }
             Bas[j]=false;
-            DBG("Comensalism ", adjM(i,j))    
+            //DBG("Comensalism ", adjM(i,j))    
               
           } else if( adjM(i,j)<0 && adjM(j,i)==0 ){    // Amensalism
             
             A(i,j)=true;
-            adjM(i,j)=-runif(1,0,predIntAvg*2)[0];
-            DBG("Amensalism ", adjM(i,j))    
+            if(rndType==0)
+              adjM(i,j)=-runif(1,a_predInt,b_predInt)[0];         // Random uniform number
+            else if(rndType==1) {
+              adjM(i,j)=-rgamma(1,shape,rate)[0];         // Random gamma number
+              DBG("\t", adjM(i,j))
+            }
+            //DBG("Amensalism ", adjM(i,j))    
               
           }
-          DBG("adjM ",adjM)
-          DBG("A ", A)
+          //DBG("adjM ",adjM)
+          //DBG("A ", A)
         } 
       }
     }
@@ -210,10 +260,10 @@ List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntAvg=0.
     m[i] = runif(1,0,migrAvg*2)[0];
     
     }
-  DBG("Basales: \n",Bas)
-  DBG("Mutualistas: \n",Mut)
-  DBG("A: \n",A)
-  DBG("adjM: \n", adjM)    
+  //DBG("Basales: \n",Bas)
+  //DBG("Mutualistas: \n",Mut)
+  //DBG("A: \n",A)
+  //DBG("adjM: \n", adjM)    
     
   return List::create(Named("interM") = adjM,
                       Named("r") = r,

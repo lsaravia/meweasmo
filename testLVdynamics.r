@@ -162,7 +162,7 @@ C <- 4623/(106*106)
 #
 
 A <- generateRandomGLVadjMat(100,0.01,c(0.3,0.3,0.3,0.05,0.05)) 
-A1 <- generateGLVparmsFromAdj(A,0.01,0.01)
+A1 <- generateGLVparmsFromAdj(A,0.1,0.01,preserveInt = 0,predIntSd=0.001,rndType = 1)
 yini <- rep(10,times=nrow(A1$interM))
 calcPropInteractionsGLVadjMat(A ,yini)
 

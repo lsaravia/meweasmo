@@ -101,8 +101,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // generateGLVparmsFromAdj
-List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntAvg, NumericVector selfLimAvg, double migrAvg, int preserveInt);
-RcppExport SEXP _meweasmo_generateGLVparmsFromAdj(SEXP adjMSEXP, SEXP efSEXP, SEXP predIntAvgSEXP, SEXP selfLimAvgSEXP, SEXP migrAvgSEXP, SEXP preserveIntSEXP) {
+List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntAvg, NumericVector selfLimAvg, double migrAvg, int preserveInt, double predIntSd, int rndType);
+RcppExport SEXP _meweasmo_generateGLVparmsFromAdj(SEXP adjMSEXP, SEXP efSEXP, SEXP predIntAvgSEXP, SEXP selfLimAvgSEXP, SEXP migrAvgSEXP, SEXP preserveIntSEXP, SEXP predIntSdSEXP, SEXP rndTypeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -112,7 +112,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type selfLimAvg(selfLimAvgSEXP);
     Rcpp::traits::input_parameter< double >::type migrAvg(migrAvgSEXP);
     Rcpp::traits::input_parameter< int >::type preserveInt(preserveIntSEXP);
-    rcpp_result_gen = Rcpp::wrap(generateGLVparmsFromAdj(adjM, ef, predIntAvg, selfLimAvg, migrAvg, preserveInt));
+    Rcpp::traits::input_parameter< double >::type predIntSd(predIntSdSEXP);
+    Rcpp::traits::input_parameter< int >::type rndType(rndTypeSEXP);
+    rcpp_result_gen = Rcpp::wrap(generateGLVparmsFromAdj(adjM, ef, predIntAvg, selfLimAvg, migrAvg, preserveInt, predIntSd, rndType));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -137,7 +139,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_meweasmo_metaWebNetAssemblyCT", (DL_FUNC) &_meweasmo_metaWebNetAssemblyCT, 5},
     {"_meweasmo_metaWebNetAssemblyGLV", (DL_FUNC) &_meweasmo_metaWebNetAssemblyGLV, 6},
     {"_meweasmo_calcPropInteractionsGLVadjMat", (DL_FUNC) &_meweasmo_calcPropInteractionsGLVadjMat, 2},
-    {"_meweasmo_generateGLVparmsFromAdj", (DL_FUNC) &_meweasmo_generateGLVparmsFromAdj, 6},
+    {"_meweasmo_generateGLVparmsFromAdj", (DL_FUNC) &_meweasmo_generateGLVparmsFromAdj, 8},
     {"_meweasmo_generateRandomGLVadjMat", (DL_FUNC) &_meweasmo_generateRandomGLVadjMat, 3},
     {NULL, NULL, 0}
 };
