@@ -1,7 +1,7 @@
 Package: meweasmo
 Type: Package
 Title: Simulation of metaweb assembly models
-Version: 0.1.7
+Version: 0.1.8
 Date: 2018-03-28
 Authors@R: c(person("Leonardo A.", "Saravia", email = "lsaravia@campus.ungs.edu.ar", role ="cre"))
 Maintainer: Leonardo Saravia <lsaravia@campus.ungs.edu.ar>
