@@ -2,30 +2,107 @@
 % Please edit documentation in R/RcppExports.R
 \name{metaWebNetAssemblyGLV}
 \alias{metaWebNetAssemblyGLV}
-\title{Simulation of an Assembly process from a Meta-web assuming stochastic Generalized Lotka-Volterra
-Local dynamics}
+\title{Simulation of an Assembly process from a Meta-web with stochastic Generalized Lotka-Volterra dynamics}
 \usage{
 metaWebNetAssemblyGLV(metaW, m, r, ini, time, tau = 0.01)
 }
 \arguments{
-\item{metaW}{NumericMatrix, metacommunity interaction matrix, the values and the signs are the parameters of the LV model}
+\item{metaW}{Numeric square matrix with the interaction coefficients \eqn{A_{ij}}{A_ij} of the meta-web:
+the effect of species \code{j} on the per capita growth rate of species \code{i}, in
+\code{metaW[i, j]}. The values and the signs are the parameters of the GLV model,
+the diagonal is the self-limitation.}
 
-\item{m}{NumericVector, migration rate (probability) from the meta-web}
+\item{m}{Numeric vector of length \code{nrow(metaW)}, immigration rate of each species, in individuals
+per unit of time. It is not a probability: a species with \code{m > 0} receives immigrants
+continuously, even when it is locally absent. Use 0 for species that should not migrate.}
 
-\item{r}{NumericVector, grow rate of species, could be negative}
+\item{r}{Numeric vector of length \code{nrow(metaW)}, intrinsic per capita growth rate of each species.
+It could be negative (e.g. consumers that need resources to persist).}
 
-\item{ini}{NumericVector, initial condition, or 0}
+\item{ini}{Numeric vector with the initial abundance of each species (length \code{nrow(metaW)}), or a single
+value that is recycled to all species (e.g. 0 for an initially empty community).
+Values are truncated to integers.}
 
-\item{time}{Number of time steps of simulation}
+\item{time}{Number of time points of the simulation. The initial condition is time point 1
+and the state is recorded at each time unit, so the simulation covers \code{time - 1} time units.}
 
-\item{tau}{Number of integration steps for Tau leap method}
+\item{tau}{Size of the integration step of the tau-leap method, in time units. Each time unit is divided
+in \code{1/tau} steps, so \code{1/tau} should be an integer. Smaller values are more accurate but slower.}
 }
 \value{
-A list with a vector S the final the number of species by time, L the number of links by time, 
-              STime a time series of each species with dimension nrow(metaW) x time,
-              and the adjacency matrix A.
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  A list with:
+}\if{html}{\out{</div>}}
+\itemize{
+\item \code{S}: integer vector of length \code{time}, number of species present (abundance > 0) at each time point.
+\item \code{L}: integer vector of length \code{time}, number of directed links at each time point, that is
+the number of non-zero interactions of \code{metaW} between present species; a predator-prey
+interaction counts as one link (from prey to predator), other interactions count in each direction
+in which they are non-zero.
+\item \code{STime}: integer matrix of dimension \code{nrow(metaW)} x \code{time} with the abundance of each species
+(rows) at each time point (columns).
+\item \code{A}: logical adjacency matrix of the links in the last time point, \code{A[i, j]} is \code{TRUE} if
+there is a link from \code{i} to \code{j} (for predator-prey from the prey to the predator).
+}
 }
 \description{
-Simulation of an Assembly process from a Meta-web assuming stochastic Generalized Lotka-Volterra
-Local dynamics
+Simulates the assembly of a local community from a regional meta-web where the local population
+dynamics follow a stochastic generalized Lotka-Volterra (GLV) model with immigration.
+In contrast to \code{\link[=metaWebNetAssembly]{metaWebNetAssembly()}} and \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}}, species are not
+present or absent by definition: populations are integer abundances, a species arrives through
+immigration, and it is considered present while its abundance is greater than zero.
+Extinctions, including secondary extinctions of consumers that lose their resources, are not imposed
+by rules but emerge from the dynamics (demographic stochasticity and interactions).
+}
+\details{
+The abundance \eqn{N_i} of species \eqn{i} changes in time according to
+\deqn{\frac{dN_i}{dt} = N_i \left( r_i + \sum_j A_{ij} N_j \right) + m_i}{dN_i/dt = N_i (r_i + sum_j A_ij N_j) + m_i}
+where \eqn{r_i} is the intrinsic growth rate (\code{r}), \eqn{A_{ij}}{A_ij} the interaction matrix (\code{metaW})
+and \eqn{m_i} a constant immigration rate (\code{m}).
+
+The model is integrated with the tau-leap method [1]: time is divided in steps of size \code{tau},
+and in each step the abundance of each species changes by a Poisson distributed number of individuals
+with mean \code{abs(rate) * tau}, where \code{rate} is the right hand side of the equation above;
+the change is positive if \code{rate > 0} and negative otherwise. Abundances are truncated at zero.
+Species are updated sequentially within a step, so a species uses the already updated abundances
+of the species before it.
+
+The signs of the interaction matrix define the type of interaction between species \code{i} and \code{j}:
+\itemize{
+\item \code{metaW[i, j] < 0} and \code{metaW[j, i] > 0}: predator-prey, \code{j} is the predator and \code{i} the prey.
+\item \code{metaW[i, j] > 0} and \code{metaW[j, i] > 0}: mutualism.
+\item \code{metaW[i, j] < 0} and \code{metaW[j, i] < 0}: competition.
+\item \code{metaW[i, j] != 0} and \code{metaW[j, i] == 0}: commensalism (if positive) or amensalism (if negative).
+\item \code{metaW[i, i] < 0}: self-limitation (density dependence). Without it, or without negative
+interactions, abundances can grow without bound.
+}
+
+Parameters of this kind of matrix can be generated at random with \code{\link[=generateRandomGLVadjMat]{generateRandomGLVadjMat()}}
+(structure) and \code{\link[=generateGLVparmsFromAdj]{generateGLVparmsFromAdj()}} (interaction strengths, \code{r} and \code{m}).
+}
+\examples{
+# Predator-prey dynamics with immigration
+A <- matrix(c(-0.001, -0.08,
+               0.01,   0   ), nrow = 2, byrow = TRUE)
+set.seed(123)
+out <- metaWebNetAssemblyGLV(A, m = c(0.1, 0.2), r = c(1.5, -0.25), ini = c(0, 0), 
+                             time = 50, tau = 0.1)
+matplot(t(out$STime), type = "l", lty = 1, xlab = "Time", ylab = "Abundance")
+out$S
+
+# Random meta-web of 20 species, starting from an empty community
+set.seed(1)
+adj <- generateRandomGLVadjMat(20, 0.2, c(0.1, 0.3, 0.3, 0.15, 0.15))
+parms <- generateGLVparmsFromAdj(adj, ef = 0.1, predIntAvg = 0.01, migrAvg = 0.01)
+out <- metaWebNetAssemblyGLV(parms$interM, parms$m, parms$r, ini = 0, time = 100, tau = 0.1)
+plot(out$S, type = "l", xlab = "Time", ylab = "Number of species")
+}
+\references{
+\enumerate{
+\item Gillespie, D. T. (2001). Approximate accelerated stochastic simulation of chemically reacting systems.
+Journal of Chemical Physics, 115(4), 1716–1733. https://doi.org/10.1063/1.1378322
+}
+}
+\seealso{
+\code{\link[=metaWebNetAssembly]{metaWebNetAssembly()}} and \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}} for models with presence/absence
+dynamics, \code{\link[=generateGLVparmsFromAdj]{generateGLVparmsFromAdj()}} to generate the parameters.
 }

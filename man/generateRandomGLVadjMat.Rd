@@ -12,7 +12,7 @@ generateRandomGLVadjMat(numSp, C, propInt)
 \item{C}{Double, Probability of interaction = Connectivity = number of interacions/(numSp^2)}
 
 \item{propInt}{Numeric vector, Proportion of interactions, there are 5 types of interactions the elements of the vector
-represent 1= mutualism (+,+), 2=Predator-prey (+,-), 3= competition (-,-), 4=Comensalims (+,0), 
+represent 1= mutualism (+,+), 2=Predator-prey (+,-), 3= competition (-,-), 4=Comensalims (+,0),
 5=Amensalism (-,0).}
 }
 \value{

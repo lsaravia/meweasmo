@@ -14,3 +14,4 @@ URL: https://github.com/lsaravia/meweasmo
 BugReports: https://github.com/lsaravia/meweasmo/issues
 Suggests: testthat
 Encoding: UTF-8
+Roxygen: list(markdown = TRUE)

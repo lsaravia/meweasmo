@@ -29,13 +29,13 @@ that represent self-limitation, the elements of the vector represent 1=mutualist
 
 \item{migrAvg}{Average value to generate a uniform random migration with range [0,migrAvg*2]}
 
-\item{preserveInt}{if 0 the values are random defined by `rndType` with `predIntAvg` as a mean, if 1 the values of the interactions adjM[i,i] when i!=j are preserved.
+\item{preserveInt}{if 0 the values are random defined by \code{rndType} with \code{predIntAvg} as a mean, if 1 the values of the interactions adjM[i,i] when i!=j are preserved.
 if 2 the values are random uniform with mean given by adjM[i,i] when i!=j.}
 
-\item{predIntSd}{Standard deviation of the distribution to generate the interaction values for `preserveInt = 0` and `rndType = 1` gamma distribution.
-For uniform distribution the sd is fixed at `predIntAvg*2 / sqrt(12)`}
+\item{predIntSd}{Standard deviation of the distribution to generate the interaction values for \code{preserveInt = 0} and \code{rndType = 1} gamma distribution.
+For uniform distribution the sd is fixed at \code{predIntAvg*2 / sqrt(12)}}
 
-\item{rndType}{0=uniform, 1=gamma NOTE: this is implemented only for `preserveInt = 0`}
+\item{rndType}{0=uniform, 1=gamma NOTE: this is implemented only for \code{preserveInt = 0}}
 }
 \value{
 A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m

@@ -2,37 +2,60 @@
 % Please edit documentation in R/RcppExports.R
 \name{metaWebNetAssemblyCT}
 \alias{metaWebNetAssemblyCT}
-\title{Simulation of an Assembly process from a Meta-web assuming the interactions are conserved in the local web}
+\title{Simulation of an Assembly process from a Meta-web (continuous time)}
 \usage{
 metaWebNetAssemblyCT(metaW, m, e, se, time)
 }
 \arguments{
 \item{metaW}{metacommunity adyacency matrix}
 
-\item{m}{A numeric vector of species' migration rates (probability) from the meta-web}
+\item{m}{A numeric vector of species' migration rates (events per unit of time) from the meta-web}
 
-\item{e}{A numeric vector of species' extinction probability}
+\item{e}{A numeric vector of species' extinction rates}
 
-\item{se}{A numeric vector of species' secondary extinction probability}
+\item{se}{A numeric vector of species' secondary extinction rates}
 
-\item{time}{Number of time steps of simulation}
+\item{time}{Simulated time, the state is recorded at integer times 1 to time-1}
 }
 \value{
-A list with the final the number of species by time S, the number of links by time L, 
-              the time series of species STime and the adjacency matrix A with effective links.
+A list with the number of species with at least one link by time S, the number of links by time L,
+the time series of species presence STime (one row per species, one column per recorded time)
+and the adjacency matrix A with effective links.
 }
 \description{
-This is a dynamical model of colonization and extinction process [1], similar to the TTIB model described in [2]. 
-With an additional secondary extinctions probability that controls when a predator goes extinct if it has
-no prey. This is a continuous time version of the model that follows the Gillespie algorithm [3] for simulation
-There are 3 possible events migration with rate *m*, local extinction with rate *e*, and secondary extinction when
-a predators has no prey with rate *se*. The parameters are vectors so each species could have their own parameter values.
+This is a dynamical model of colonization and extinction process [1], similar to the TTIB model described in [2].
+The interactions of the meta-web are conserved in the local web. With an additional secondary
+extinction rate that controls when a predator goes extinct if it has no prey.
+}
+\details{
+This is the continuous time version of \code{\link[=metaWebNetAssembly]{metaWebNetAssembly()}}, simulated with the Gillespie
+algorithm [3]. There are 3 possible events: migration with rate \emph{m}, local extinction with rate \emph{e}, and secondary
+extinction, when a predator has no prey, with rate \emph{se}. The parameters are vectors so each species could have their
+own parameter values. At each iteration only one event happens: the species and the event type are chosen with
+probability proportional to the rates, and the waiting time until the event is drawn from an exponential
+distribution with parameter equal to the sum of all rates. The state of the system is recorded at integer times
+1, 2, ..., \emph{time}-1.
+
+The main differences with the discrete time version \code{\link[=metaWebNetAssembly]{metaWebNetAssembly()}} are:
+\itemize{
+\item \emph{m}, \emph{e} and \emph{se} are rates (events per unit of time) and can be larger than 1, instead of probabilities
+per time step in [0,1].
+\item Events are asynchronous, one at a time, instead of all species being updated in each time step.
+\item Secondary extinctions are not resolved in cascade within a step: a predator without prey
+goes extinct only when its own secondary extinction event happens, so cascades unfold over time.
+\item The time series are samples of the state at integer times, and the number of events between samples is variable.
+}
 }
 \references{
-1. Saravia, L. A., Marina, T. I., Kristensen, N. P., De Troch, M., & Momo, F. R. (2022). Ecological network assembly: 
+\enumerate{
+\item Saravia, L. A., Marina, T. I., Kristensen, N. P., De Troch, M., & Momo, F. R. (2022). Ecological network assembly:
 How the regional metaweb influences local food webs. Journal of Animal Ecology, 91(3), 630–642. https://doi.org/10.1111/1365-2656.13652
-2. Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux, S., Cazelles, K., et al. (2018). 
+\item Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux, S., Cazelles, K., et al. (2018).
 The spatial scaling of species interaction networks. Nat. Ecol. Evol., 2, 782–790
-3. Gillespie, D. T. (1976). A general method for numerically simulating the stochastic time evolution of coupled chemical reactions. 
+\item Gillespie, D. T. (1976). A general method for numerically simulating the stochastic time evolution of coupled chemical reactions.
 Journal of Computational Physics, 22(4), 403–434. doi: 10.1016/0021-9991(76)90041-3
+}
+}
+\seealso{
+\code{\link[=metaWebNetAssembly]{metaWebNetAssembly()}} for the discrete time version.
 }

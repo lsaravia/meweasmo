@@ -4,9 +4,9 @@
 #' Simulation of a neutral network assembly procesess
 #'
 #' This model simulates an assembly process starting from basal species, that could be fixed with the 
-#'   parameter BB or allowed to migrate with rate m. The interactions are established with probability q with 
-#'   no restrictions, execpt that double interactions A->B, B->A and self interactions are not allowed. The model 
-#'   simulates secondary extinctions, when a predator has all his preys extinct it will become locally exctinct.
+#' parameter BB or allowed to migrate with rate m. The interactions are established with probability q with 
+#' no restrictions, execpt that double interactions A->B, B->A and self interactions are not allowed. The model 
+#' simulates secondary extinctions, when a predator has all his preys extinct it will become locally exctinct.
 #' 
 #' @param rho metacommunity number of species
 #' @param m   migration rate (probability) from the meta-web   
@@ -25,9 +25,9 @@ neutralNetAssembly <- function(rho, m, q, a, time, BB = 0L) {
 #' Simulation of a Cascade fod web assembly procesess
 #'
 #' This model simulates an assembly process starting from basal species, that could be fixed with the 
-#'   parameter BB or allowed to migrate with rate m. The interactions are established with probability q 
-#'   if species i>j then i becomes predator and j prey  (i<--j). The model simulates secondary extinctions, 
-#'   when a predator has all his preys extinct it will become locally exctinct.
+#' parameter BB or allowed to migrate with rate m. The interactions are established with probability q 
+#' if species i>j then i becomes predator and j prey  (i<--j). The model simulates secondary extinctions, 
+#' when a predator has all his preys extinct it will become locally exctinct.
 #' 
 #' @param rho    metacommunity number of species
 #' @param m      migration rate (probability) from the meta-web   
@@ -35,44 +35,73 @@ neutralNetAssembly <- function(rho, m, q, a, time, BB = 0L) {
 #' @param a      extinctions of species (not proportional to C)   
 #' @param time   time of simulation   
 #' @param BB     number of basal species if 0 will be ~poison(rho*m)   
-#' @return       A list with the final the number of species by time S, the number of links by time L, the number of basal species
-#'               and the adjacency matrix A. 
+#' @return A list with the final the number of species by time S, the number of links by time L, the number of basal species
+#' and the adjacency matrix A. 
 #' @export
 cascadeNetAssembly <- function(rho, m, q, a, time, BB = 0L) {
     .Call(`_meweasmo_cascadeNetAssembly`, rho, m, q, a, time, BB)
 }
 
-#' Simulation of an Assembly process from a Meta-web assuming the interactions are conserved in the local web 
+#' Simulation of an Assembly process from a Meta-web (discrete time)
 #'
-#' This is a dynamical model of colonization and extinction process, with the restriction 
-#' that predators must have at least one prey species to survive in the local community,  described in [1] 
-#' With an additional secondary extinctions probability that controls when a predator goes extinct if it has
-#' no prey.
-#' 
+#' This is a dynamical model of colonization and extinction process, with the restriction
+#' that predators must have at least one prey species to survive in the local community, similar to the
+#' trophic theory of island biogeography (TTIB) described in \[2\], and implemented as in \[1\].
+#' The interactions of the meta-web are conserved in the local web. With an additional secondary
+#' extinction probability that controls when a predator goes extinct if it has no prey.
+#'
+#' This is the discrete time version of the model: at each time step all species are updated synchronously,
+#' in this order: (1) every absent species can migrate from the meta-web with probability *m*;
+#' (2) every present species can become locally extinct with probability *e*; (3) every present non-basal
+#' species left without prey goes extinct with probability *se*, and this is repeated until no more secondary
+#' extinctions occur, so a single time step can produce a cascade of secondary extinctions.
+#' Because *m*, *e* and *se* are probabilities per time step they must be in the range \[0,1\].
+#'
+#' The continuous time version, in which events happen one at a time with rates instead of probabilities,
+#' is [metaWebNetAssemblyCT()].
+#'
 #' @references
-#' 
-#' 1. Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux, S., Cazelles, K., et al. (2018). 
+#'
+#' 1. Saravia, L. A., Marina, T. I., Kristensen, N. P., De Troch, M., & Momo, F. R. (2022). Ecological network assembly:
+#' How the regional metaweb influences local food webs. Journal of Animal Ecology, 91(3), 630–642. https://doi.org/10.1111/1365-2656.13652
+#' 2. Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux, S., Cazelles, K., et al. (2018).
 #' The spatial scaling of species interaction networks. Nat. Ecol. Evol., 2, 782–790
 #'
-#' @param metaW  metacommunity adyacency matrix 
-#' @param m      A numeric vector of species' migration rates (probability) from the meta-web   
-#' @param e      A numeric vector of species' extinction probability 
-#' @param se      A numeric vector of species' secondary extinction probability 
+#' @param metaW  metacommunity adyacency matrix
+#' @param m      A numeric vector of species' migration probabilities per time step from the meta-web
+#' @param e      A numeric vector of species' extinction probabilities per time step
+#' @param se     A numeric vector of species' secondary extinction probabilities per time step
 #' @param time   Number of time steps of simulation
-#' @return       A list with the final the number of species by time S, the number of links by time L, 
-#'               the time series of species STime and the adjacency matrix A with effective links. 
+#' @return A list with the number of species with at least one link by time S, the number of links by time L,
+#' the time series of species presence STime (one row per species, one column per time step)
+#' and the adjacency matrix A with effective links.
+#' @seealso [metaWebNetAssemblyCT()] for the continuous time version.
 metaWebNetAssembly <- function(metaW, m, e, se, time) {
     .Call(`_meweasmo_metaWebNetAssembly`, metaW, m, e, se, time)
 }
 
-#' Simulation of an Assembly process from a Meta-web assuming the interactions are conserved in the local web 
+#' Simulation of an Assembly process from a Meta-web (continuous time)
 #'
-#' This is a dynamical model of colonization and extinction process [1], similar to the TTIB model described in [2]. 
-#' With an additional secondary extinctions probability that controls when a predator goes extinct if it has
-#' no prey. This is a continuous time version of the model that follows the Gillespie algorithm [3] for simulation
-#' There are 3 possible events migration with rate *m*, local extinction with rate *e*, and secondary extinction when
-#' a predators has no prey with rate *se*. The parameters are vectors so each species could have their own parameter values.
-#' 
+#' This is a dynamical model of colonization and extinction process \[1\], similar to the TTIB model described in \[2\].
+#' The interactions of the meta-web are conserved in the local web. With an additional secondary
+#' extinction rate that controls when a predator goes extinct if it has no prey.
+#'
+#' This is the continuous time version of [metaWebNetAssembly()], simulated with the Gillespie
+#' algorithm \[3\]. There are 3 possible events: migration with rate *m*, local extinction with rate *e*, and secondary
+#' extinction, when a predator has no prey, with rate *se*. The parameters are vectors so each species could have their
+#' own parameter values. At each iteration only one event happens: the species and the event type are chosen with
+#' probability proportional to the rates, and the waiting time until the event is drawn from an exponential
+#' distribution with parameter equal to the sum of all rates. The state of the system is recorded at integer times
+#' 1, 2, ..., *time*-1.
+#'
+#' The main differences with the discrete time version [metaWebNetAssembly()] are:
+#' * *m*, *e* and *se* are rates (events per unit of time) and can be larger than 1, instead of probabilities
+#' per time step in \[0,1\].
+#' * Events are asynchronous, one at a time, instead of all species being updated in each time step.
+#' * Secondary extinctions are not resolved in cascade within a step: a predator without prey
+#' goes extinct only when its own secondary extinction event happens, so cascades unfold over time.
+#' * The time series are samples of the state at integer times, and the number of events between samples is variable.
+#'
 #' @references
 #' 
 #' 1. Saravia, L. A., Marina, T. I., Kristensen, N. P., De Troch, M., & Momo, F. R. (2022). Ecological network assembly: 
@@ -83,29 +112,101 @@ metaWebNetAssembly <- function(metaW, m, e, se, time) {
 #' Journal of Computational Physics, 22(4), 403–434. doi: 10.1016/0021-9991(76)90041-3
 #' 
 #'
-#' @param metaW  metacommunity adyacency matrix 
-#' @param m      A numeric vector of species' migration rates (probability) from the meta-web   
-#' @param e      A numeric vector of species' extinction probability 
-#' @param se      A numeric vector of species' secondary extinction probability 
-#' @param time   Number of time steps of simulation
-#' @return       A list with the final the number of species by time S, the number of links by time L, 
-#'               the time series of species STime and the adjacency matrix A with effective links. 
+#' @param metaW  metacommunity adyacency matrix
+#' @param m      A numeric vector of species' migration rates (events per unit of time) from the meta-web
+#' @param e      A numeric vector of species' extinction rates
+#' @param se     A numeric vector of species' secondary extinction rates
+#' @param time   Simulated time, the state is recorded at integer times 1 to time-1
+#' @return A list with the number of species with at least one link by time S, the number of links by time L,
+#' the time series of species presence STime (one row per species, one column per recorded time)
+#' and the adjacency matrix A with effective links.
+#' @seealso [metaWebNetAssembly()] for the discrete time version.
 metaWebNetAssemblyCT <- function(metaW, m, e, se, time) {
     .Call(`_meweasmo_metaWebNetAssemblyCT`, metaW, m, e, se, time)
 }
 
-#' Simulation of an Assembly process from a Meta-web assuming stochastic Generalized Lotka-Volterra
-#' Local dynamics  
+#' Simulation of an Assembly process from a Meta-web with stochastic Generalized Lotka-Volterra dynamics
 #'
-#' @param metaW  NumericMatrix, metacommunity interaction matrix, the values and the signs are the parameters of the LV model  
-#' @param m      NumericVector, migration rate (probability) from the meta-web   
-#' @param r      NumericVector, grow rate of species, could be negative
-#' @param ini    NumericVector, initial condition, or 0  
-#' @param time   Number of time steps of simulation
-#' @param tau    Number of integration steps for Tau leap method 
-#' @return       A list with a vector S the final the number of species by time, L the number of links by time, 
-#'               STime a time series of each species with dimension nrow(metaW) x time,
-#'               and the adjacency matrix A. 
+#' Simulates the assembly of a local community from a regional meta-web where the local population 
+#' dynamics follow a stochastic generalized Lotka-Volterra (GLV) model with immigration. 
+#' In contrast to [metaWebNetAssembly()] and [metaWebNetAssemblyCT()], species are not 
+#' present or absent by definition: populations are integer abundances, a species arrives through 
+#' immigration, and it is considered present while its abundance is greater than zero. 
+#' Extinctions, including secondary extinctions of consumers that lose their resources, are not imposed 
+#' by rules but emerge from the dynamics (demographic stochasticity and interactions).
+#' 
+#' The abundance \eqn{N_i} of species \eqn{i} changes in time according to
+#' \deqn{\frac{dN_i}{dt} = N_i \left( r_i + \sum_j A_{ij} N_j \right) + m_i}{dN_i/dt = N_i (r_i + sum_j A_ij N_j) + m_i}
+#' where \eqn{r_i} is the intrinsic growth rate (`r`), \eqn{A_{ij}}{A_ij} the interaction matrix (`metaW`) 
+#' and \eqn{m_i} a constant immigration rate (`m`). 
+#' 
+#' The model is integrated with the tau-leap method \[1\]: time is divided in steps of size `tau`, 
+#' and in each step the abundance of each species changes by a Poisson distributed number of individuals 
+#' with mean `abs(rate) * tau`, where `rate` is the right hand side of the equation above; 
+#' the change is positive if `rate > 0` and negative otherwise. Abundances are truncated at zero. 
+#' Species are updated sequentially within a step, so a species uses the already updated abundances 
+#' of the species before it. 
+#' 
+#' The signs of the interaction matrix define the type of interaction between species `i` and `j`:
+#' * `metaW[i, j] < 0` and `metaW[j, i] > 0`: predator-prey, `j` is the predator and `i` the prey.
+#' * `metaW[i, j] > 0` and `metaW[j, i] > 0`: mutualism.
+#' * `metaW[i, j] < 0` and `metaW[j, i] < 0`: competition.
+#' * `metaW[i, j] != 0` and `metaW[j, i] == 0`: commensalism (if positive) or amensalism (if negative).
+#' * `metaW[i, i] < 0`: self-limitation (density dependence). Without it, or without negative 
+#'   interactions, abundances can grow without bound.
+#' 
+#' Parameters of this kind of matrix can be generated at random with [generateRandomGLVadjMat()] 
+#' (structure) and [generateGLVparmsFromAdj()] (interaction strengths, `r` and `m`). 
+#' 
+#' @references
+#' 
+#' 1. Gillespie, D. T. (2001). Approximate accelerated stochastic simulation of chemically reacting systems. 
+#' Journal of Chemical Physics, 115(4), 1716–1733. https://doi.org/10.1063/1.1378322
+#'
+#' @param metaW  Numeric square matrix with the interaction coefficients \eqn{A_{ij}}{A_ij} of the meta-web: 
+#'               the effect of species `j` on the per capita growth rate of species `i`, in 
+#'               `metaW[i, j]`. The values and the signs are the parameters of the GLV model, 
+#'               the diagonal is the self-limitation.
+#' @param m      Numeric vector of length `nrow(metaW)`, immigration rate of each species, in individuals 
+#'               per unit of time. It is not a probability: a species with `m > 0` receives immigrants 
+#'               continuously, even when it is locally absent. Use 0 for species that should not migrate.
+#' @param r      Numeric vector of length `nrow(metaW)`, intrinsic per capita growth rate of each species. 
+#'               It could be negative (e.g. consumers that need resources to persist).
+#' @param ini    Numeric vector with the initial abundance of each species (length `nrow(metaW)`), or a single
+#'               value that is recycled to all species (e.g. 0 for an initially empty community).
+#'               Values are truncated to integers.
+#' @param time   Number of time points of the simulation. The initial condition is time point 1 
+#'               and the state is recorded at each time unit, so the simulation covers `time - 1` time units.
+#' @param tau    Size of the integration step of the tau-leap method, in time units. Each time unit is divided 
+#'               in `1/tau` steps, so `1/tau` should be an integer. Smaller values are more accurate but slower.
+#' @return       A list with:
+#' * `S`: integer vector of length `time`, number of species present (abundance > 0) at each time point.
+#' * `L`: integer vector of length `time`, number of directed links at each time point, that is 
+#'   the number of non-zero interactions of `metaW` between present species; a predator-prey 
+#'   interaction counts as one link (from prey to predator), other interactions count in each direction 
+#'   in which they are non-zero.
+#' * `STime`: integer matrix of dimension `nrow(metaW)` x `time` with the abundance of each species 
+#'   (rows) at each time point (columns).
+#' * `A`: logical adjacency matrix of the links in the last time point, `A[i, j]` is `TRUE` if 
+#'   there is a link from `i` to `j` (for predator-prey from the prey to the predator).
+#' @seealso [metaWebNetAssembly()] and [metaWebNetAssemblyCT()] for models with presence/absence 
+#' dynamics, [generateGLVparmsFromAdj()] to generate the parameters.
+#' @examples
+#' # Predator-prey dynamics with immigration
+#' A <- matrix(c(-0.001, -0.08,
+#'                0.01,   0   ), nrow = 2, byrow = TRUE)
+#' set.seed(123)
+#' out <- metaWebNetAssemblyGLV(A, m = c(0.1, 0.2), r = c(1.5, -0.25), ini = c(0, 0), 
+#'                              time = 50, tau = 0.1)
+#' matplot(t(out$STime), type = "l", lty = 1, xlab = "Time", ylab = "Abundance")
+#' out$S
+#' 
+#' # Random meta-web of 20 species, starting from an empty community
+#' set.seed(1)
+#' adj <- generateRandomGLVadjMat(20, 0.2, c(0.1, 0.3, 0.3, 0.15, 0.15))
+#' parms <- generateGLVparmsFromAdj(adj, ef = 0.1, predIntAvg = 0.01, migrAvg = 0.01)
+#' out <- metaWebNetAssemblyGLV(parms$interM, parms$m, parms$r, ini = 0, time = 100, tau = 0.1)
+#' plot(out$S, type = "l", xlab = "Time", ylab = "Number of species")
 #' @export
 metaWebNetAssemblyGLV <- function(metaW, m, r, ini, time, tau = 0.01) {
     .Call(`_meweasmo_metaWebNetAssemblyGLV`, metaW, m, r, ini, time, tau)
@@ -116,8 +217,10 @@ metaWebNetAssemblyGLV <- function(metaW, m, r, ini, time, tau = 0.01) {
 #' @param adjM       Numeric Matrix Lotka-Volterra adjcency matrix  
 #' @param sp         Numeric vector with the present species, if species=0 the interaction is not counted
 #' 
-#' @return           Numeric vector with 5 elements Matrix 1=Mutualistic (+,+), 2=Predator-prey (-,+), 3=Competitive (-,-)
-#'                   4=Comensalism (+,0), 5=Amensalism (-,0)
+#' @return Numeric vector with 5 elements Matrix 1=Mutualistic (+,+), 2=Predator-prey (-,+), 3=Competitive (-,-)
+#' 4=Comensalism (+,0), 5=Amensalism (-,0). Proportions are computed over directed matrix entries,
+#' so symmetric interactions (mutualism and competition, two entries each) weigh twice as much
+#' as the other types (one entry each).
 #' @export
 calcPropInteractionsGLVadjMat <- function(adjM, spc) {
     .Call(`_meweasmo_calcPropInteractionsGLVadjMat`, adjM, spc)
@@ -126,20 +229,20 @@ calcPropInteractionsGLVadjMat <- function(adjM, spc) {
 #' Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix  
 #'
 #' @param adjM       NumericMatrix, metacommunity interaction matrix, the values and the signs are 
-#'                   the parameters of the LV model then a predator prey interaction will be adjM(i,j)=-1 
-#'                   adjM(j,i)=1 where j is the predator and i the prey. Competitive interaction is adjM(i,j)=adjM(j,i)=-1
+#' the parameters of the LV model then a predator prey interaction will be adjM(i,j)=-1 
+#' adjM(j,i)=1 where j is the predator and i the prey. Competitive interaction is adjM(i,j)=adjM(j,i)=-1
 #' @param ef         Eficiency of predator prey interactions
 #' @param predIntAvg Average value for the interaction intensity of predator-preys, competition, mutalistic. 
 #' @param selfLimAvg Numeric vector, and  also set the average value for diagonal entries of the interaction matrix
-#'                   that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.
-#' @param migrAvg    Average value to generate a uniform random migration with range [0,migrAvg*2] 
-#' @param preserveInt if 0 the values are random defined by `rndType` with `predIntAvg` as a mean, if 1 the values of the interactions adjM[i,i] when i!=j are preserved.
-#'                    if 2 the values are random uniform with mean given by adjM[i,i] when i!=j.
+#' that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.
+#' @param migrAvg    Average value to generate a uniform random migration with range \[0,migrAvg*2\] 
+#' @param preserveInt if 0 the values are random defined by `rndType` with `predIntAvg` as a mean, if 1 the values of the interactions adjM\[i,i\] when i!=j are preserved.
+#' if 2 the values are random uniform with mean given by adjM\[i,i\] when i!=j.
 #' @param predIntSd  Standard deviation of the distribution to generate the interaction values for `preserveInt = 0` and `rndType = 1` gamma distribution.
-#'                   For uniform distribution the sd is fixed at `predIntAvg*2 / sqrt(12)`
+#' For uniform distribution the sd is fixed at `predIntAvg*2 / sqrt(12)`
 #' @param rndType    0=uniform, 1=gamma NOTE: this is implemented only for `preserveInt = 0`
-#'                                   
-#' @return           A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
+#' 
+#' @return A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
 #' @export
 generateGLVparmsFromAdj <- function(adjM, ef, predIntAvg = 0.01, selfLimAvg = as.numeric( c(0.01, 0.01, 0.01)), migrAvg = 0.0, preserveInt = 0L, predIntSd = 0.01, rndType = 0L) {
     .Call(`_meweasmo_generateGLVparmsFromAdj`, adjM, ef, predIntAvg, selfLimAvg, migrAvg, preserveInt, predIntSd, rndType)
@@ -150,9 +253,9 @@ generateGLVparmsFromAdj <- function(adjM, ef, predIntAvg = 0.01, selfLimAvg = as
 #' @param numSp      Integer, number of species 
 #' @param C          Double, Probability of interaction = Connectivity = number of interacions/(numSp^2)
 #' @param propInt    Numeric vector, Proportion of interactions, there are 5 types of interactions the elements of the vector
-#'                   represent 1= mutualism (+,+), 2=Predator-prey (+,-), 3= competition (-,-), 4=Comensalims (+,0), 
-#'                   5=Amensalism (-,0). 
-#' @return           A NumericMatrix with the GLV type of adjacency matrix  
+#' represent 1= mutualism (+,+), 2=Predator-prey (+,-), 3= competition (-,-), 4=Comensalims (+,0), 
+#' 5=Amensalism (-,0). 
+#' @return A NumericMatrix with the GLV type of adjacency matrix  
 #' @export
 generateRandomGLVadjMat <- function(numSp, C, propInt) {
     .Call(`_meweasmo_generateRandomGLVadjMat`, numSp, C, propInt)
