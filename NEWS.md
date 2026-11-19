@@ -39,6 +39,11 @@
   matrix signs, that `m` is an immigration rate in individuals per unit of time
   (not a probability) and that `tau` is the step size (not a number of steps),
   describes each element of the returned list, and adds a reference and examples.
+* `generateGLVparmsFromAdj()` and `generateGLVparmsFromAdjR()`: documented how
+  interaction types, species types (mutualistic, basal, consumer),
+  self-limitation, growth and migration rates are generated. Removed the
+  statement that the Rcpp version "presumably has memory issues": the in-place
+  modification of the input was fixed and both versions give the same results.
 * roxygen2 now uses markdown (`Roxygen: list(markdown = TRUE)`).
 * `calcPropInteractionsGLVadjMat()`: documented that proportions are computed
   over directed matrix entries, so mutualism and competition (two entries each)

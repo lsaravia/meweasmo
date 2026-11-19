@@ -1,23 +1,24 @@
-#' R function to generate random parameters for the Lotka-Volterra model from an adjacency matrix. 
+#' R implementation of generateGLVparmsFromAdj
 #' 
-#' There is an equivalent Rcpp function which presumably has memory issues.
+#' Generates random parameters of a generalized Lotka-Volterra model from an adjacency matrix. 
+#' It is equivalent to [generateGLVparmsFromAdj()]: it has the same arguments and, for the same 
+#' random seed, it gives the same results (this is checked by the package tests). 
+#' It is written in R, so it is slower but easier to read and modify, and it can be used as a reference 
+#' implementation. See [generateGLVparmsFromAdj()] for a detailed description of how the 
+#' parameters are generated.
 #' 
-#' @param adjM       Numeric matrix, metacommunity interaction matrix, the values and the signs are
-#' the parameters of the LV model then a predator prey interaction will be adjM\[i,j\]=-1
-#' adjM\[j,i\]=1 where j is the predator and i the prey. Competitive interaction is adjM\[i,j\]=adjM\[j,i\]=-1
-#' @param ef         Efficiency of predator prey interactions
-#' @param predIntAvg Average value for the interaction intensity of predator-preys, competition, mutalistic.
-#' @param selfLimAvg Numeric vector, and  also set the average value for diagonal entries of the interaction matrix
-#' that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.
-#' @param migrAvg    Average value to generate a uniform random migration with range \[0,migrAvg*2\]
-#' @param preserveInt if 0 the values are random defined by `rndType` with `predIntAvg` as a mean, if 1 the values of the interactions adjM\[i,i\] when i!=j are preserved.
-#' if 2 the values are random uniform with mean given by adjM\[i,i\] when i!=j.
-#' @param predIntSd  Standard deviation of the distribution to generate the interaction values for `preserveInt = 0` and `rndType = 1` gamma distribution.
-#' For uniform distribution the sd is fixed at `predIntAvg*2 / sqrt(12)`
-#' @param rndType    0=uniform, 1=gamma NOTE: this is implemented only for `preserveInt = 0`
-#'
-#' @return A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
-#' 
+#' @inheritParams generateGLVparmsFromAdj
+#' @inherit generateGLVparmsFromAdj return
+#' @seealso [generateGLVparmsFromAdj()] for the Rcpp implementation, [generateRandomGLVadjMat()] to 
+#'          generate `adjM`, and [metaWebNetAssemblyGLV()].
+#' @examples
+#' set.seed(1)
+#' adj <- generateRandomGLVadjMat(20, 0.2, c(0.1, 0.3, 0.3, 0.15, 0.15))
+#' set.seed(2)
+#' a <- generateGLVparmsFromAdj(adj, ef = 0.1)
+#' set.seed(2)
+#' b <- generateGLVparmsFromAdjR(adj, ef = 0.1)
+#' all.equal(a, b)
 #' @importFrom stats, rbinom, rgamma, runif
 #' @export
 generateGLVparmsFromAdjR <- function(adjM, ef, predIntAvg = 0.01, selfLimAvg = c(0.01, 0.01, 0.01),

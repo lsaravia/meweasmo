@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{generateGLVparmsFromAdj}
 \alias{generateGLVparmsFromAdj}
-\title{Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix}
+\title{Generate random parameters of a generalized Lotka-Volterra model from an adjacency matrix}
 \usage{
 generateGLVparmsFromAdj(
   adjM,
@@ -16,30 +16,85 @@ generateGLVparmsFromAdj(
 )
 }
 \arguments{
-\item{adjM}{NumericMatrix, metacommunity interaction matrix, the values and the signs are
-the parameters of the LV model then a predator prey interaction will be adjM(i,j)=-1
-adjM(j,i)=1 where j is the predator and i the prey. Competitive interaction is adjM(i,j)=adjM(j,i)=-1}
+\item{adjM}{Numeric square matrix with the structure of the interactions. Only the signs and the zeros
+are used when \code{preserveInt = 0}; with \code{preserveInt} 1 or 2 the values of the non-zero
+off-diagonal entries are used as well.}
 
-\item{ef}{Eficiency of predator prey interactions}
+\item{ef}{Efficiency of predator-prey interactions: effect on the predator / effect on the prey.}
 
-\item{predIntAvg}{Average value for the interaction intensity of predator-preys, competition, mutalistic.}
+\item{predIntAvg}{Average strength of the interactions (predator-prey, competition and mutualism)
+when \code{preserveInt = 0}.}
 
-\item{selfLimAvg}{Numeric vector, and  also set the average value for diagonal entries of the interaction matrix
-that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.}
+\item{selfLimAvg}{Numeric vector of length 3 with the average self-limitation of
+1 = mutualistic, 2 = basal and 3 = consumer species (diagonal entries of the interaction matrix).}
 
-\item{migrAvg}{Average value to generate a uniform random migration with range [0,migrAvg*2]}
+\item{migrAvg}{Average migration rate, the migration of each species is uniform in [0, 2 * \code{migrAvg}].}
 
-\item{preserveInt}{if 0 the values are random defined by \code{rndType} with \code{predIntAvg} as a mean, if 1 the values of the interactions adjM[i,i] when i!=j are preserved.
-if 2 the values are random uniform with mean given by adjM[i,i] when i!=j.}
+\item{preserveInt}{How to define the strength of the interactions:
+\itemize{
+\item 0: random values defined by \code{rndType} with mean \code{predIntAvg}.
+\item 1: the values of \code{adjM} are preserved (off-diagonal entries only).
+\item 2: random uniform values with mean given by the value in \code{adjM} for each interaction,
+that is, uniform in [0, 2 * abs(\code{adjM[i, j]})].
+}}
 
-\item{predIntSd}{Standard deviation of the distribution to generate the interaction values for \code{preserveInt = 0} and \code{rndType = 1} gamma distribution.
-For uniform distribution the sd is fixed at \code{predIntAvg*2 / sqrt(12)}}
+\item{predIntSd}{Standard deviation of the strengths when \code{preserveInt = 0} and \code{rndType = 1} (gamma distribution).
+For the uniform distribution the sd is fixed at \code{predIntAvg * 2 / sqrt(12)}.}
 
-\item{rndType}{0=uniform, 1=gamma NOTE: this is implemented only for \code{preserveInt = 0}}
+\item{rndType}{Distribution of the strengths when \code{preserveInt = 0}: 0 = uniform, 1 = gamma.
+Other values of \code{preserveInt} always use the uniform distribution.}
 }
 \value{
-A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
+A list with the interaction matrix \code{interM} (with the self-limitation in the diagonal),
+the intrinsic growth rates \code{r} and the migration rates \code{m}. They can be passed to
+\code{\link[=metaWebNetAssemblyGLV]{metaWebNetAssemblyGLV()}} as \code{metaW}, \code{r} and \code{m}.
 }
 \description{
-Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix
+Builds the parameters needed by \code{\link[=metaWebNetAssemblyGLV]{metaWebNetAssemblyGLV()}} (interaction matrix, intrinsic growth rates
+and migration rates) from a matrix that only defines the structure of the interactions,
+for example one generated with \code{\link[=generateRandomGLVadjMat]{generateRandomGLVadjMat()}}. The input matrix is not modified.
+}
+\details{
+The type of each interaction is read from the signs of \code{adjM} (\code{adjM[i, j]} is the effect of
+species \code{j} on species \code{i}):
+\itemize{
+\item \code{adjM[i, j] < 0} and \code{adjM[j, i] > 0}: predator-prey, \code{j} is the predator and \code{i} the prey.
+The strength of the effect on the prey is random and the effect on the predator is
+\code{ef} times the effect on the prey, with opposite sign.
+\item both negative: competition; both positive: mutualism. Each direction gets its own random strength.
+\item \code{adjM[i, j] > 0} and \code{adjM[j, i] == 0}: commensalism (\code{i} benefits);
+\code{adjM[i, j] < 0} and \code{adjM[j, i] == 0}: amensalism (\code{i} is harmed).
+}
+
+The strengths of the interactions (off-diagonal values) are drawn according to \code{preserveInt} and \code{rndType}.
+
+The remaining parameters depend on the type of each species, which is also deduced from \code{adjM}:
+\emph{mutualistic} if it takes part in any mutualistic interaction, otherwise \emph{basal} if it has no
+resources (it is never the predator in a predator-prey interaction, nor the species \code{j} in a commensalism),
+otherwise \emph{consumer}. For each type:
+\itemize{
+\item Self-limitation (diagonal of the interaction matrix): \code{-runif(0, 2 * selfLimAvg[k])},
+where \code{k} is 1 for mutualistic, 2 for basal and 3 for consumer species.
+The diagonal of \code{adjM} is ignored.
+\item Intrinsic growth rate \code{r}: positive, \code{runif(0, 1)}, for basal species; negative, \code{-runif(0, 1)}, for
+consumers (they need resources to persist); and of random sign, with the same magnitude, for
+mutualistic species (random obligate mutualism).
+\item Migration \code{m}: \code{runif(0, 2 * migrAvg)} for all species.
+}
+
+There is an equivalent implementation in R, \code{\link[=generateGLVparmsFromAdjR]{generateGLVparmsFromAdjR()}}, that gives the same
+results for the same random seed.
+}
+\examples{
+set.seed(1)
+adj <- generateRandomGLVadjMat(20, 0.2, c(0.1, 0.3, 0.3, 0.15, 0.15))
+parms <- generateGLVparmsFromAdj(adj, ef = 0.1, predIntAvg = 0.01, migrAvg = 0.01)
+str(parms)
+
+# Gamma distributed interaction strengths
+parms <- generateGLVparmsFromAdj(adj, ef = 0.1, predIntAvg = 0.01, predIntSd = 0.001, rndType = 1)
+}
+\seealso{
+\code{\link[=generateRandomGLVadjMat]{generateRandomGLVadjMat()}} to generate \code{adjM}, \code{\link[=generateGLVparmsFromAdjR]{generateGLVparmsFromAdjR()}} for the R
+implementation, and \code{\link[=metaWebNetAssemblyGLV]{metaWebNetAssemblyGLV()}}.
 }

@@ -9,23 +9,70 @@ using namespace Rcpp;
 #define DBG4(MSG,X,XX,Y,Z) 
 
 
-//' Generate random parameters for Lotka-Volterra generalized interaction matrix from Lotka-Volterra adjacency matrix  
+//' Generate random parameters of a generalized Lotka-Volterra model from an adjacency matrix
 //'
-//' @param adjM       NumericMatrix, metacommunity interaction matrix, the values and the signs are 
-//' the parameters of the LV model then a predator prey interaction will be adjM(i,j)=-1 
-//' adjM(j,i)=1 where j is the predator and i the prey. Competitive interaction is adjM(i,j)=adjM(j,i)=-1
-//' @param ef         Eficiency of predator prey interactions
-//' @param predIntAvg Average value for the interaction intensity of predator-preys, competition, mutalistic. 
-//' @param selfLimAvg Numeric vector, and  also set the average value for diagonal entries of the interaction matrix
-//' that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.
-//' @param migrAvg    Average value to generate a uniform random migration with range \[0,migrAvg*2\] 
-//' @param preserveInt if 0 the values are random defined by `rndType` with `predIntAvg` as a mean, if 1 the values of the interactions adjM\[i,i\] when i!=j are preserved.
-//' if 2 the values are random uniform with mean given by adjM\[i,i\] when i!=j.
-//' @param predIntSd  Standard deviation of the distribution to generate the interaction values for `preserveInt = 0` and `rndType = 1` gamma distribution.
-//' For uniform distribution the sd is fixed at `predIntAvg*2 / sqrt(12)`
-//' @param rndType    0=uniform, 1=gamma NOTE: this is implemented only for `preserveInt = 0`
+//' Builds the parameters needed by [metaWebNetAssemblyGLV()] (interaction matrix, intrinsic growth rates 
+//' and migration rates) from a matrix that only defines the structure of the interactions, 
+//' for example one generated with [generateRandomGLVadjMat()]. The input matrix is not modified.
 //' 
-//' @return A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
+//' The type of each interaction is read from the signs of `adjM` (`adjM[i, j]` is the effect of 
+//' species `j` on species `i`):
+//' * `adjM[i, j] < 0` and `adjM[j, i] > 0`: predator-prey, `j` is the predator and `i` the prey. 
+//'   The strength of the effect on the prey is random and the effect on the predator is 
+//'   `ef` times the effect on the prey, with opposite sign.
+//' * both negative: competition; both positive: mutualism. Each direction gets its own random strength.
+//' * `adjM[i, j] > 0` and `adjM[j, i] == 0`: commensalism (`i` benefits); 
+//'   `adjM[i, j] < 0` and `adjM[j, i] == 0`: amensalism (`i` is harmed).
+//' 
+//' The strengths of the interactions (off-diagonal values) are drawn according to `preserveInt` and `rndType`.
+//' 
+//' The remaining parameters depend on the type of each species, which is also deduced from `adjM`: 
+//' *mutualistic* if it takes part in any mutualistic interaction, otherwise *basal* if it has no
+//' resources (it is never the predator in a predator-prey interaction, nor the species `j` in a commensalism), 
+//' otherwise *consumer*. For each type:
+//' * Self-limitation (diagonal of the interaction matrix): `-runif(0, 2 * selfLimAvg[k])`, 
+//'   where `k` is 1 for mutualistic, 2 for basal and 3 for consumer species. 
+//'   The diagonal of `adjM` is ignored.
+//' * Intrinsic growth rate `r`: positive, `runif(0, 1)`, for basal species; negative, `-runif(0, 1)`, for 
+//'   consumers (they need resources to persist); and of random sign, with the same magnitude, for 
+//'   mutualistic species (random obligate mutualism).
+//' * Migration `m`: `runif(0, 2 * migrAvg)` for all species.
+//' 
+//' There is an equivalent implementation in R, [generateGLVparmsFromAdjR()], that gives the same 
+//' results for the same random seed.
+//'
+//' @param adjM       Numeric square matrix with the structure of the interactions. Only the signs and the zeros
+//'                   are used when `preserveInt = 0`; with `preserveInt` 1 or 2 the values of the non-zero 
+//'                   off-diagonal entries are used as well. 
+//' @param ef         Efficiency of predator-prey interactions: effect on the predator / effect on the prey.
+//' @param predIntAvg Average strength of the interactions (predator-prey, competition and mutualism) 
+//'                   when `preserveInt = 0`.
+//' @param selfLimAvg Numeric vector of length 3 with the average self-limitation of 
+//'                   1 = mutualistic, 2 = basal and 3 = consumer species (diagonal entries of the interaction matrix).
+//' @param migrAvg    Average migration rate, the migration of each species is uniform in \[0, 2 * `migrAvg`\].
+//' @param preserveInt How to define the strength of the interactions:
+//' * 0: random values defined by `rndType` with mean `predIntAvg`.
+//' * 1: the values of `adjM` are preserved (off-diagonal entries only).
+//' * 2: random uniform values with mean given by the value in `adjM` for each interaction, 
+//'   that is, uniform in \[0, 2 * abs(`adjM[i, j]`)\].
+//' @param predIntSd  Standard deviation of the strengths when `preserveInt = 0` and `rndType = 1` (gamma distribution).
+//'                   For the uniform distribution the sd is fixed at `predIntAvg * 2 / sqrt(12)`.
+//' @param rndType    Distribution of the strengths when `preserveInt = 0`: 0 = uniform, 1 = gamma. 
+//'                   Other values of `preserveInt` always use the uniform distribution.
+//' 
+//' @return A list with the interaction matrix `interM` (with the self-limitation in the diagonal), 
+//'         the intrinsic growth rates `r` and the migration rates `m`. They can be passed to 
+//'         [metaWebNetAssemblyGLV()] as `metaW`, `r` and `m`.
+//' @seealso [generateRandomGLVadjMat()] to generate `adjM`, [generateGLVparmsFromAdjR()] for the R 
+//'          implementation, and [metaWebNetAssemblyGLV()].
+//' @examples
+//' set.seed(1)
+//' adj <- generateRandomGLVadjMat(20, 0.2, c(0.1, 0.3, 0.3, 0.15, 0.15))
+//' parms <- generateGLVparmsFromAdj(adj, ef = 0.1, predIntAvg = 0.01, migrAvg = 0.01)
+//' str(parms)
+//' 
+//' # Gamma distributed interaction strengths
+//' parms <- generateGLVparmsFromAdj(adj, ef = 0.1, predIntAvg = 0.01, predIntSd = 0.001, rndType = 1)
 //' @export
 // [[Rcpp::export]]
 List generateGLVparmsFromAdj(NumericMatrix adjM, double ef, double predIntAvg=0.01, NumericVector selfLimAvg = NumericVector::create(0.01, 0.01, 0.01),

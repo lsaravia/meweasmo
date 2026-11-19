@@ -2,7 +2,7 @@
 % Please edit documentation in R/generateGLVparms.R
 \name{generateGLVparmsFromAdjR}
 \alias{generateGLVparmsFromAdjR}
-\title{R function to generate random parameters for the Lotka-Volterra model from an adjacency matrix.}
+\title{R implementation of generateGLVparmsFromAdj}
 \usage{
 generateGLVparmsFromAdjR(
   adjM,
@@ -16,30 +16,57 @@ generateGLVparmsFromAdjR(
 )
 }
 \arguments{
-\item{adjM}{Numeric matrix, metacommunity interaction matrix, the values and the signs are
-the parameters of the LV model then a predator prey interaction will be adjM[i,j]=-1
-adjM[j,i]=1 where j is the predator and i the prey. Competitive interaction is adjM[i,j]=adjM[j,i]=-1}
+\item{adjM}{Numeric square matrix with the structure of the interactions. Only the signs and the zeros
+are used when \code{preserveInt = 0}; with \code{preserveInt} 1 or 2 the values of the non-zero
+off-diagonal entries are used as well.}
 
-\item{ef}{Efficiency of predator prey interactions}
+\item{ef}{Efficiency of predator-prey interactions: effect on the predator / effect on the prey.}
 
-\item{predIntAvg}{Average value for the interaction intensity of predator-preys, competition, mutalistic.}
+\item{predIntAvg}{Average strength of the interactions (predator-prey, competition and mutualism)
+when \code{preserveInt = 0}.}
 
-\item{selfLimAvg}{Numeric vector, and  also set the average value for diagonal entries of the interaction matrix
-that represent self-limitation, the elements of the vector represent 1=mutualistic, 2=Basal, 3=predator species.}
+\item{selfLimAvg}{Numeric vector of length 3 with the average self-limitation of
+1 = mutualistic, 2 = basal and 3 = consumer species (diagonal entries of the interaction matrix).}
 
-\item{migrAvg}{Average value to generate a uniform random migration with range [0,migrAvg*2]}
+\item{migrAvg}{Average migration rate, the migration of each species is uniform in [0, 2 * \code{migrAvg}].}
 
-\item{preserveInt}{if 0 the values are random defined by \code{rndType} with \code{predIntAvg} as a mean, if 1 the values of the interactions adjM[i,i] when i!=j are preserved.
-if 2 the values are random uniform with mean given by adjM[i,i] when i!=j.}
+\item{preserveInt}{How to define the strength of the interactions:
+\itemize{
+\item 0: random values defined by \code{rndType} with mean \code{predIntAvg}.
+\item 1: the values of \code{adjM} are preserved (off-diagonal entries only).
+\item 2: random uniform values with mean given by the value in \code{adjM} for each interaction,
+that is, uniform in [0, 2 * abs(\code{adjM[i, j]})].
+}}
 
-\item{predIntSd}{Standard deviation of the distribution to generate the interaction values for \code{preserveInt = 0} and \code{rndType = 1} gamma distribution.
-For uniform distribution the sd is fixed at \code{predIntAvg*2 / sqrt(12)}}
+\item{predIntSd}{Standard deviation of the strengths when \code{preserveInt = 0} and \code{rndType = 1} (gamma distribution).
+For the uniform distribution the sd is fixed at \code{predIntAvg * 2 / sqrt(12)}.}
 
-\item{rndType}{0=uniform, 1=gamma NOTE: this is implemented only for \code{preserveInt = 0}}
+\item{rndType}{Distribution of the strengths when \code{preserveInt = 0}: 0 = uniform, 1 = gamma.
+Other values of \code{preserveInt} always use the uniform distribution.}
 }
 \value{
-A list with the interaction matrix interM, the intrinsic growth rates r, and migration values m
+A list with the interaction matrix \code{interM} (with the self-limitation in the diagonal),
+the intrinsic growth rates \code{r} and the migration rates \code{m}. They can be passed to
+\code{\link[=metaWebNetAssemblyGLV]{metaWebNetAssemblyGLV()}} as \code{metaW}, \code{r} and \code{m}.
 }
 \description{
-There is an equivalent Rcpp function which presumably has memory issues.
+Generates random parameters of a generalized Lotka-Volterra model from an adjacency matrix.
+It is equivalent to \code{\link[=generateGLVparmsFromAdj]{generateGLVparmsFromAdj()}}: it has the same arguments and, for the same
+random seed, it gives the same results (this is checked by the package tests).
+It is written in R, so it is slower but easier to read and modify, and it can be used as a reference
+implementation. See \code{\link[=generateGLVparmsFromAdj]{generateGLVparmsFromAdj()}} for a detailed description of how the
+parameters are generated.
+}
+\examples{
+set.seed(1)
+adj <- generateRandomGLVadjMat(20, 0.2, c(0.1, 0.3, 0.3, 0.15, 0.15))
+set.seed(2)
+a <- generateGLVparmsFromAdj(adj, ef = 0.1)
+set.seed(2)
+b <- generateGLVparmsFromAdjR(adj, ef = 0.1)
+all.equal(a, b)
+}
+\seealso{
+\code{\link[=generateGLVparmsFromAdj]{generateGLVparmsFromAdj()}} for the Rcpp implementation, \code{\link[=generateRandomGLVadjMat]{generateRandomGLVadjMat()}} to
+generate \code{adjM}, and \code{\link[=metaWebNetAssemblyGLV]{metaWebNetAssemblyGLV()}}.
 }
