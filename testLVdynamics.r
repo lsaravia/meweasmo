@@ -219,8 +219,15 @@ calcTopologicalIndices(g)
 #
 
 A <- generateRandomGLVadjMat(100,0.05,c(0.2,0.5,0.1,0.0,0.0)) 
-A
-A1 <- generateGLVparmsFromAdj(A,0.1,0.01)
+A <- generateRandomGLVadjMat(10,0.05,c(0.0,1,0.0,0.0,0.0))
+calcPropInteractionsGLVadjMat(A, rep(TRUE,10))
+calc_topological_indices( fromGLVadjToIgraph(A,rep(TRUE,10)))
+
+A1 <- generateGLVparmsFromAdj(A,0.1,0.01, c(0,0.001,0.001), migrAvg = 0.0, 
+                              preserveInt = 0 , predIntSd = 0.1, rndType = 1)
+calcPropInteractionsGLVadjMat(A1$interM, rep(TRUE,10))
+diag(A1$interM) <- 0
+calc_topological_indices( fromGLVadjToIgraph(A1$interM,rep(TRUE,10)))
 
 yini <- rep(1,times=nrow(A1$interM))
 
