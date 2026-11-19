@@ -1,4 +1,4 @@
 library(testthat)
-library(MetaWebAssemblyModels)
+library(meweasmo)
 
-test_check("MetaWebAssemblyModels")
+test_check("meweasmo")
