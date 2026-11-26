@@ -1,8 +1,8 @@
 Package: meweasmo
 Type: Package
 Title: Simulation of metaweb assembly models
-Version: 0.2.0
-Date: 2026-11-19
+Version: 0.3.0
+Date: 2026-11-26
 Authors@R: c(person("Leonardo A.", "Saravia", email = "lsaravia@campus.ungs.edu.ar", role ="cre"))
 Maintainer: Leonardo Saravia <lsaravia@campus.ungs.edu.ar>
 Description: Simulate Network Assembly processes
