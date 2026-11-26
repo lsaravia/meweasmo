@@ -2,9 +2,22 @@
 % Please edit documentation in R/meweasmo.R
 \docType{package}
 \name{meweasmo}
+\alias{meweasmo-package}
 \alias{meweasmo}
 \title{meweasmo: A package for simulation of ecological network assembly}
 \description{
 The meweasmo package provides stochastic models to simulate the assembly of ecological
 networks from a metaweb or regional species pool.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/lsaravia/meweasmo}
+  \item Report bugs at \url{https://github.com/lsaravia/meweasmo/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Leonardo A. Saravia \email{lsaravia@campus.ungs.edu.ar}
+
 }

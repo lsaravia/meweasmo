@@ -212,6 +212,36 @@ metaWebNetAssemblyGLV <- function(metaW, m, r, ini, time, tau = 0.01) {
     .Call(`_meweasmo_metaWebNetAssemblyGLV`, metaW, m, r, ini, time, tau)
 }
 
+#' Simulation of an Assembly process from a multilayer Meta-web (continuous time, core)
+#'
+#' Core simulation used by [metaWebNetAssemblyML()], which builds its matrix arguments from a list of
+#' layers. It is the continuous time model of [metaWebNetAssemblyCT()] with two additions:
+#'
+#' * **Non-trophic modifiers of extinction**: the extinction rate of species *i* depends on which species
+#'   are present, \eqn{e_i(t) = e_i \exp(\sum_j M_{ij} x_j(t))}, where \eqn{x_j(t)} is 1 if species *j* is present.
+#'   A negative \eqn{M_{ij}} (e.g. a mutualist or a facilitator) lowers the extinction rate of *i* while *j* is present,
+#'   a positive one (e.g. a competitor) raises it. With `M = 0` the model is [metaWebNetAssemblyCT()].
+#' * **Obligate dependence**: if species *i* depends on at least one species (`Dep[i, ]` has a `TRUE`) and none of them
+#'   is present, *i* goes extinct with the secondary extinction rate *se*, as a predator without prey does.
+#'
+#' The state dependent extinction rate is simulated exactly by thinning: extinction events are proposed with the
+#' upper bound \eqn{e_i \exp(\sum_j \max(M_{ij},0))} and accepted with probability \eqn{e_i(t)} divided by that bound.
+#' Large positive values in `M` make the bound large and the simulation slower (more rejected events).
+#'
+#' @param metaW  Logical trophic adjacency matrix of the meta-web, `metaW[j, i]` is `TRUE` if *j* is a prey of *i*.
+#' @param M      Numeric matrix, `M[i, j]` is the effect of the presence of *j* on the log extinction rate of *i*.
+#' @param Dep    Logical matrix, `Dep[i, j]` is `TRUE` if *i* depends obligately on *j*.
+#' @param m      A numeric vector of species' migration rates from the meta-web
+#' @param e      A numeric vector of species' baseline extinction rates
+#' @param se     A numeric vector of species' secondary extinction rates (no prey, or no obligate partner)
+#' @param time   Simulated time, the state is recorded at integer times 1 to time-1
+#' @return A list as [metaWebNetAssemblyCT()]: S, L, STime and the trophic adjacency matrix A with effective links,
+#'   plus `rejected`, the number of rejected extinction proposals.
+#' @seealso [metaWebNetAssemblyML()], [metaWebNetAssemblyCT()]
+metaWebNetAssemblyMLCT <- function(metaW, M, Dep, m, e, se, time) {
+    .Call(`_meweasmo_metaWebNetAssemblyMLCT`, metaW, M, Dep, m, e, se, time)
+}
+
 #' Calculate the proportion of interactions types in a Lotka-Volterra adjacency matrix
 #'
 #' @param adjM       Numeric Matrix Lotka-Volterra adjcency matrix  
