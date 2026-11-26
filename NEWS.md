@@ -1,3 +1,26 @@
+# meweasmo 0.3.0
+
+## New features
+
+* `metaWebNetAssemblyML()`: multilayer version of the continuous-time metaweb
+  assembly model. Non-trophic layers change the extinction rates: a species
+  present with a positive effect (mutualism, commensalism) lowers the
+  extinction rate of its partner and one with a negative effect (competition,
+  amensalism) raises it, `e_i(t) = e_i exp(beta_neg f-_i - beta_pos f+_i)`,
+  with `f` the fraction of partners present (`normalize = FALSE` adds the
+  effects per partner instead). Optional obligate dependence
+  (`obligate_on`, `obligate_layers`): dependent species go extinct with rate
+  `se` when none of the species they depend on (e.g. foundation species) is
+  present. Takes an `mgraph` or list of igraph layers, an igraph with a layer
+  attribute, or an edge data.frame; uses a per-link sign attribute
+  (`effect_attr`) when present, otherwise the layer signs of
+  `default_layer_signs()`. With `beta = 0` and no obligate rule it is
+  `metaWebNetAssemblyCT()`.
+* `build_multilayer_assembly()`: the matrices of the multilayer model, to check
+  how the layers were translated.
+* `metaWebNetAssemblyMLCT()`: the C++ core of the multilayer model
+  (extinction rates simulated exactly by thinning).
+
 # meweasmo 0.2.0
 
 ## New features

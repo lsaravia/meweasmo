@@ -88,6 +88,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// metaWebNetAssemblyMLCT
+List metaWebNetAssemblyMLCT(LogicalMatrix metaW, NumericMatrix M, LogicalMatrix Dep, NumericVector m, NumericVector e, NumericVector se, int time);
+RcppExport SEXP _meweasmo_metaWebNetAssemblyMLCT(SEXP metaWSEXP, SEXP MSEXP, SEXP DepSEXP, SEXP mSEXP, SEXP eSEXP, SEXP seSEXP, SEXP timeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< LogicalMatrix >::type metaW(metaWSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type M(MSEXP);
+    Rcpp::traits::input_parameter< LogicalMatrix >::type Dep(DepSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type m(mSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type e(eSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type se(seSEXP);
+    Rcpp::traits::input_parameter< int >::type time(timeSEXP);
+    rcpp_result_gen = Rcpp::wrap(metaWebNetAssemblyMLCT(metaW, M, Dep, m, e, se, time));
+    return rcpp_result_gen;
+END_RCPP
+}
 // calcPropInteractionsGLVadjMat
 NumericVector calcPropInteractionsGLVadjMat(NumericMatrix adjM, NumericVector spc);
 RcppExport SEXP _meweasmo_calcPropInteractionsGLVadjMat(SEXP adjMSEXP, SEXP spcSEXP) {
@@ -138,6 +155,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_meweasmo_metaWebNetAssembly", (DL_FUNC) &_meweasmo_metaWebNetAssembly, 5},
     {"_meweasmo_metaWebNetAssemblyCT", (DL_FUNC) &_meweasmo_metaWebNetAssemblyCT, 5},
     {"_meweasmo_metaWebNetAssemblyGLV", (DL_FUNC) &_meweasmo_metaWebNetAssemblyGLV, 6},
+    {"_meweasmo_metaWebNetAssemblyMLCT", (DL_FUNC) &_meweasmo_metaWebNetAssemblyMLCT, 7},
     {"_meweasmo_calcPropInteractionsGLVadjMat", (DL_FUNC) &_meweasmo_calcPropInteractionsGLVadjMat, 2},
     {"_meweasmo_generateGLVparmsFromAdj", (DL_FUNC) &_meweasmo_generateGLVparmsFromAdj, 8},
     {"_meweasmo_generateRandomGLVadjMat", (DL_FUNC) &_meweasmo_generateRandomGLVadjMat, 3},
