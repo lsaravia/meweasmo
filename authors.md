@@ -7,7 +7,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/lsaravia/meweasmo/blob/master/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/lsaravia/meweasmo/blob/v0.3.1/DESCRIPTION)
 
 Saravia L (2026). *meweasmo: Simulation of metaweb assembly models*. R
 package version 0.3.1, <https://github.com/lsaravia/meweasmo>.
