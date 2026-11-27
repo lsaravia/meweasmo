@@ -152,6 +152,7 @@ calcPropInteractionsGLVadjMat(A,yini)
 
 ```{r}
 
+set.seed(42)
 A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 
 ```

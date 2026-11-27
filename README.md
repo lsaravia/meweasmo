@@ -168,6 +168,7 @@ calcPropInteractionsGLVadjMat(A,yini)
 
 ``` r
 
+set.seed(42)
 A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 ```
 
@@ -177,10 +178,10 @@ A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 ``` r
 
 A1$STime[,1000]
-#> [1] 249 116 953 139  17 799
+#> [1]  218   88  871  137    0 1212
 
 calcPropInteractionsGLVadjMat(A,A1$STime[,1000])
-#> [1] 0.2 0.6 0.0 0.1 0.1
+#> [1] 0.2857143 0.5714286 0.0000000 0.1428571 0.0000000
 ```
 
 - Plot the time series of the species
