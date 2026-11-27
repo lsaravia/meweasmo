@@ -27,11 +27,78 @@ install_github('lsaravia/meweasmo')
 library(meweasmo)
 ```
 
+## Get started with the trophic assembly model
+
+[`metaWebNetAssemblyCT()`](https://lsaravia.github.io/meweasmo/reference/metaWebNetAssemblyCT.md)
+simulates the assembly of a local food web from a regional metaweb in
+continuous time, following the trophic theory of island biogeography
+\[2\] as extended in \[1\]:
+
+- species arrive from the metaweb with migration rate *m*,
+- present species go extinct with rate *e*,
+- predators with no prey in the local web go extinct with the secondary
+  extinction rate *se*.
+
+Only the links among the species present are realized. The metaweb is a
+logical matrix where `metaW[j, i]` is `TRUE` if species *j* is a prey of
+species *i*. As an example we build a random metaweb of 40 species in
+which species only eat species with a lower index, so the first ones are
+basal:
+
+``` r
+
+library(meweasmo)
+set.seed(1)
+S0 <- 40
+metaW <- matrix(FALSE, S0, S0)
+metaW[upper.tri(metaW)] <- runif(S0 * (S0 - 1) / 2) < 0.1
+sum(colSums(metaW) == 0)               # basal species
+#> [1] 14
+```
+
+Simulate 500 time units with the same rates for all species:
+
+``` r
+
+tf <- 500
+sim <- metaWebNetAssemblyCT(metaW, m = rep(0.1, S0), e = rep(0.05, S0), se = rep(0.5, S0), time = tf)
+names(sim)
+#> [1] "S"     "L"     "STime" "A"
+```
+
+`S` and `L` are the number of species with trophic links and of links in
+the local web at each time, `STime` the presence of each species
+(species x time) and `A` the adjacency matrix of the local web at the
+end:
+
+``` r
+
+plot(2:(tf - 1), sim$S[2:(tf - 1)], type = "l", xlab = "Time", ylab = "Species (S)")
+```
+
+![](reference/figures/README-ct-plot-1.png)
+
+``` r
+
+c(metaweb_S = S0, local_S = mean(sim$S[400:(tf - 1)]),
+  local_C = mean(sim$L[400:(tf - 1)] / sim$S[400:(tf - 1)]^2))
+#>   metaweb_S     local_S     local_C 
+#> 40.00000000 20.83000000  0.05500939
+```
+
+The local web reaches a stochastic equilibrium below the size of the
+metaweb, set by the balance between migration and (primary and
+secondary) extinction. In \[1\] the rates *m*, *e* and *se* are fitted
+by approximate Bayesian computation to the number of species and the
+connectance of empirical food webs.
+
 ## Multilayer networks: trophic and non-trophic interactions
 
 [`metaWebNetAssemblyML()`](https://lsaravia.github.io/meweasmo/reference/metaWebNetAssemblyML.md)
-extends the continuous-time assembly model to multilayer networks. The
-trophic layer defines the meta-web and the secondary extinctions, as in
+extends
+[`metaWebNetAssemblyCT()`](https://lsaravia.github.io/meweasmo/reference/metaWebNetAssemblyCT.md)
+to multilayer networks. The trophic layer defines the meta-web and the
+secondary extinctions, as in
 [`metaWebNetAssemblyCT()`](https://lsaravia.github.io/meweasmo/reference/metaWebNetAssemblyCT.md);
 the non-trophic layers change the extinction rates: losing a mutualist
 or a habitat provider raises the extinction rate of a species, losing a
@@ -113,6 +180,7 @@ calcPropInteractionsGLVadjMat(A,yini)
 ``` r
 
 
+set.seed(42)
 A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 ```
 
@@ -123,10 +191,10 @@ A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 
 
 A1$STime[,1000]
-#> [1]  329  305 1003  165   82  532
+#> [1]  218   88  871  137    0 1212
 
 calcPropInteractionsGLVadjMat(A,A1$STime[,1000])
-#> [1] 0.2 0.6 0.0 0.1 0.1
+#> [1] 0.2857143 0.5714286 0.0000000 0.1428571 0.0000000
 ```
 
 - Plot the time series of the species
@@ -145,7 +213,7 @@ library(ggplot2)
 ggplot(df1, aes(time,N,colour=Species)) + geom_point(size=0.1) +  theme_bw() + scale_color_viridis_d()
 ```
 
-![](reference/figures/README-unnamed-chunk-7-1.png)
+![](reference/figures/README-unnamed-chunk-8-1.png)
 
 ## References
 
