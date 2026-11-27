@@ -1,0 +1,35 @@
+url: https://lsaravia.github.io/meweasmo/
+template:
+  bootstrap: 5
+
+reference:
+- title: Colonization-extinction models from a meta-web
+  contents:
+  - metaWebNetAssembly
+  - metaWebNetAssemblyCT
+- title: Multilayer (trophic and non-trophic) assembly
+  contents:
+  - metaWebNetAssemblyML
+  - build_multilayer_assembly
+  - default_layer_signs
+  - metaWebNetAssemblyMLCT
+- title: Generalized Lotka-Volterra models
+  contents:
+  - metaWebNetAssemblyGLV
+  - generateGLVparmsFromAdj
+  - generateGLVparmsFromAdjR
+  - generateRandomGLVadjMat
+  - calcPropInteractionsGLVadjMat
+- title: Other assembly models
+  contents:
+  - neutralNetAssembly
+  - cascadeNetAssembly
+- title: Package
+  contents:
+  - meweasmo
+
+articles:
+- title: Articles
+  navbar: ~
+  contents:
+  - multilayer-assembly

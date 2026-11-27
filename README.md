@@ -27,6 +27,30 @@ install_github('lsaravia/meweasmo')
 library(meweasmo)
 ```
 
+## Multilayer networks: trophic and non-trophic interactions
+
+`metaWebNetAssemblyML()` extends the continuous-time assembly model to multilayer networks. The trophic layer
+defines the meta-web and the secondary extinctions, as in `metaWebNetAssemblyCT()`; the non-trophic layers change
+the extinction rates: losing a mutualist or a habitat provider raises the extinction rate of a species, losing a
+competitor lowers it. Optionally, species can depend obligately on others (e.g. foundation species). The network
+can be an `mgraph` from the [multiweb](https://github.com/lsaravia/multiweb) package, a list of igraph layers, or
+an edge list.
+
+``` r
+fpath <- system.file("extdata", package = "multiweb")
+dn <- list.files(fpath, pattern = "^Kefi2015.*\\.txt$")
+mg <- multiweb::readMultiplex(dn, types = c("Negative", "Positive", "Trophic"), fpath, skipColumn = 2)
+
+# sign of the effect received by the species at the origin and at the end of each link
+layers <- data.frame(layer = c("Trophic", "Positive", "Negative"), sign_from = c(-1, 1, -1),
+                     sign_to = c(1, 0, 0), rule = c("trophic", "modifier", "modifier"))
+
+r <- metaWebNetAssemblyML(mg, layers, beta = c(pos = 1, neg = 1), m = 0.1, e = 0.05, se = 0.5, time = 300)
+```
+
+See the article [Assembly of multilayer networks](https://lsaravia.github.io/meweasmo/articles/multilayer-assembly.html)
+(`vignette("multilayer-assembly")`) for a worked example with the Chilean rocky intertidal network of Kéfi et al. (2015).
+
 ## Get Started with Generalized Lotka-volterra model
 
 ### Simulate a 6 species network without migration
