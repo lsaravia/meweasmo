@@ -1,0 +1,78 @@
+# Simulation of an Assembly process from a Meta-web (discrete time)
+
+This is a dynamical model of colonization and extinction process, with
+the restriction that predators must have at least one prey species to
+survive in the local community, similar to the trophic theory of island
+biogeography (TTIB) described in \[2\], and implemented as in \[1\]. The
+interactions of the meta-web are conserved in the local web. With an
+additional secondary extinction probability that controls when a
+predator goes extinct if it has no prey.
+
+## Usage
+
+``` r
+metaWebNetAssembly(metaW, m, e, se, time)
+```
+
+## Arguments
+
+- metaW:
+
+  metacommunity adyacency matrix
+
+- m:
+
+  A numeric vector of species' migration probabilities per time step
+  from the meta-web
+
+- e:
+
+  A numeric vector of species' extinction probabilities per time step
+
+- se:
+
+  A numeric vector of species' secondary extinction probabilities per
+  time step
+
+- time:
+
+  Number of time steps of simulation
+
+## Value
+
+A list with the number of species with at least one link by time S, the
+number of links by time L, the time series of species presence STime
+(one row per species, one column per time step) and the adjacency matrix
+A with effective links.
+
+## Details
+
+This is the discrete time version of the model: at each time step all
+species are updated synchronously, in this order: (1) every absent
+species can migrate from the meta-web with probability *m*; (2) every
+present species can become locally extinct with probability *e*; (3)
+every present non-basal species left without prey goes extinct with
+probability *se*, and this is repeated until no more secondary
+extinctions occur, so a single time step can produce a cascade of
+secondary extinctions. Because *m*, *e* and *se* are probabilities per
+time step they must be in the range \[0,1\].
+
+The continuous time version, in which events happen one at a time with
+rates instead of probabilities, is
+[`metaWebNetAssemblyCT()`](https://lsaravia.github.io/meweasmo/reference/metaWebNetAssemblyCT.md).
+
+## References
+
+1.  Saravia, L. A., Marina, T. I., Kristensen, N. P., De Troch, M., &
+    Momo, F. R. (2022). Ecological network assembly: How the regional
+    metaweb influences local food webs. Journal of Animal Ecology,
+    91(3), 630–642. https://doi.org/10.1111/1365-2656.13652
+
+2.  Galiana, N., Lurgi, M., Claramunt-López, B., Fortin, M.-J., Leroux,
+    S., Cazelles, K., et al. (2018). The spatial scaling of species
+    interaction networks. Nat. Ecol. Evol., 2, 782–790
+
+## See also
+
+[`metaWebNetAssemblyCT()`](https://lsaravia.github.io/meweasmo/reference/metaWebNetAssemblyCT.md)
+for the continuous time version.
