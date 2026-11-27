@@ -2,7 +2,7 @@
 % Please edit documentation in R/metaWebNetAssemblyML.R
 \name{metaWebNetAssemblyML}
 \alias{metaWebNetAssemblyML}
-\title{Simulation of an Assembly process from a multilayer Meta-web}
+\title{Simulation of an assembly process from a multilayer meta-web}
 \usage{
 metaWebNetAssemblyML(
   mg,
@@ -21,52 +21,67 @@ metaWebNetAssemblyML(
 )
 }
 \arguments{
-\item{mg}{the multilayer network: an \code{mgraph} or a list of igraph layers (layer id = list name, or the
-\code{type_attr} edge attribute if the list has no names), a single igraph with the layer in the edge attribute
-\code{type_attr}, or a data.frame with columns \code{from}, \code{to} and \code{layer}.}
+\item{mg}{the multilayer network: an \code{mgraph} (the list of igraph layers returned by \code{multiweb::readMultiplex()})
+or any list of igraph layers, where the layer id is the list name or, if the list has no names, the
+\code{type_attr} edge attribute; a single igraph with the layer id in the edge attribute \code{type_attr}; or a
+data.frame with columns \code{from}, \code{to}, \code{layer} and, optionally, the sign column \code{effect_attr}. Vertices need a
+\code{name} attribute.}
 
-\item{layers}{data.frame with the layer signs and rules, see \code{\link[=default_layer_signs]{default_layer_signs()}}. Every layer present in
-\code{mg} must be in it, and exactly one layer must have \code{rule == "trophic"}.}
+\item{layers}{data.frame with one row per layer: \code{layer} (the id), \code{sign_from}, \code{sign_to} and \code{rule}
+(\code{"trophic"} or \code{"modifier"}); see \code{\link[=default_layer_signs]{default_layer_signs()}}. Every layer of \code{mg} must be in it, and exactly one
+must have \code{rule == "trophic"}.}
 
-\item{beta}{numeric vector \code{c(pos = , neg = )}, strength of positive and negative effects on the log extinction rate.}
+\item{beta}{named numeric vector \code{c(pos = , neg = )}: strength of the positive and of the negative effects on the
+log extinction rate. With \code{normalize = TRUE}, \code{exp(beta)} is the largest factor by which the partners can
+change the extinction rate.}
 
-\item{m, e, se}{migration, baseline extinction and secondary extinction rates, one value or one per species
-(in the order of the \code{species} element of the result).}
+\item{m, e, se}{migration, baseline extinction and secondary extinction rates, one value or one per species,
+in the order of the \code{species} element of the result (the order in which species first appear in \code{mg}).}
 
 \item{time}{simulated time, the state is recorded at integer times 1 to time-1.}
 
-\item{layer_beta}{optional named numeric vector, multiplies \code{beta} for each layer (default 1).}
+\item{layer_beta}{optional named numeric vector, a multiplier of \code{beta} for each layer (default 1).}
 
-\item{obligate_on}{character vector of species (e.g. the foundation species). A species that receives a
-positive effect from any of them in the layers \code{obligate_layers} depends obligately on them (and is not one
-of them). \code{NULL} for no obligate dependence.}
+\item{obligate_on}{character vector of species on which others can depend obligately (e.g. foundation
+species), or \code{NULL} (default) for no obligate dependence.}
 
 \item{type_attr}{name of the edge attribute with the layer id.}
 
 \item{effect_attr}{name of the edge attribute (or data.frame column) with the sign of the effect of \code{from} on
-\code{to}; \code{NULL} or a missing attribute to use the layer signs.}
+\code{to}. If it is \code{NULL} or missing, the layer signs are used.}
 
 \item{obligate_layers}{layers whose positive effects create obligate dependence; \code{NULL} (default) uses all
 modifier layers.}
 
-\item{normalize}{if \code{TRUE} (default) the positive and the negative effects on each species are divided by
-its number of positive and negative partners in the meta-web, so the extinction rate is
-\eqn{e_i \exp(\beta_- f^-_i - \beta_+ f^+_i)}, where \eqn{f} are the fractions of partners present, and
-\eqn{\exp(\beta)} is the largest possible change. With \code{FALSE} the effects add up per partner present, and a
-species with many mutualists can become practically immortal.}
+\item{normalize}{if \code{TRUE} (default) the positive and negative effects on each species are divided by its
+number of positive and negative partners, so that the effect depends on the fraction of partners present.
+With \code{FALSE} the effects add up per partner present, and a species with many mutualists can become practically
+immortal.}
 }
 \value{
-the list of \code{\link[=metaWebNetAssemblyMLCT]{metaWebNetAssemblyMLCT()}} with species names in \code{STime} and \code{A}, plus the matrices
-\code{metaW}, \code{M} and \code{Dep} and the vector \code{species}.
+the list of \code{\link[=metaWebNetAssemblyMLCT]{metaWebNetAssemblyMLCT()}} (\code{S}, \code{L}, \code{STime}, \code{A}, \code{rejected}) with species names in
+\code{STime} and \code{A}, plus \code{metaW}, \code{M}, \code{Dep} and \code{species} from \code{\link[=build_multilayer_assembly]{build_multilayer_assembly()}}.
 }
 \description{
 Continuous time colonization-extinction model of \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}} in which the non-trophic layers
-change the extinction rates and, optionally, some species depend obligately on others (e.g. on the foundation
-species). Losing a mutualist or a facilitator raises the extinction rate of a species, losing a competitor
-lowers it. See \code{\link[=build_multilayer_assembly]{build_multilayer_assembly()}} for how the layers are translated and \code{\link[=metaWebNetAssemblyMLCT]{metaWebNetAssemblyMLCT()}}
-for the dynamics.
+change the extinction rates and, optionally, some species depend obligately on others (e.g. on foundation
+species). Losing a partner with a positive effect (a mutualist, a facilitator) raises the extinction rate of a
+species; losing a partner with a negative effect (a competitor) lowers it.
 }
 \details{
+The extinction rate of species \eqn{i} while species are present is
+\deqn{e_i(t) = e_i \exp(\beta_- f^-_i(t) - \beta_+ f^+_i(t))}
+where \eqn{f^+_i(t)} and \eqn{f^-_i(t)} are the fractions of the partners of \eqn{i} with a positive and a
+negative effect on it that are present at time \eqn{t} (\code{normalize = TRUE}, the default). Thus
+\eqn{\exp(\beta_+)} and \eqn{\exp(\beta_-)} are the largest factors by which the partners can lower or raise the
+extinction rate. Migration and the trophic rule (a predator without prey goes extinct with rate \emph{se}) are as in
+\code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}}. With \code{obligate_on}, a dependent species goes extinct with rate \emph{se} when none of the
+species it depends on is present.
+
+The parameters \code{beta} (and \code{layer_beta}) are translated by \code{\link[=build_multilayer_assembly]{build_multilayer_assembly()}} into the matrix \code{M} of
+effects on the log extinction rate used by the C++ core \code{\link[=metaWebNetAssemblyMLCT]{metaWebNetAssemblyMLCT()}}. Call
+\code{\link[=build_multilayer_assembly]{build_multilayer_assembly()}} to check how a network was translated.
+
 With \code{beta = c(pos = 0, neg = 0)} and \code{obligate_on = NULL} the model is \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}} on the trophic layer.
 }
 \examples{
@@ -75,4 +90,7 @@ ed <- data.frame(from  = c("alga", "grazer", "alga",       "grazer2", "grazer"),
                  layer = c("Trophic", "Trophic", "Trophic", "Trophic", "Competition"))
 r <- metaWebNetAssemblyML(ed, beta = c(pos = 1, neg = 1), m = 0.1, e = 0.05, se = 0.5, time = 100)
 r$STime[, 99]
+}
+\seealso{
+\code{\link[=build_multilayer_assembly]{build_multilayer_assembly()}}, \code{\link[=default_layer_signs]{default_layer_signs()}}, \code{vignette("multilayer-assembly")}
 }

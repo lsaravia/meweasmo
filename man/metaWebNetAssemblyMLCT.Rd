@@ -2,14 +2,15 @@
 % Please edit documentation in R/RcppExports.R
 \name{metaWebNetAssemblyMLCT}
 \alias{metaWebNetAssemblyMLCT}
-\title{Simulation of an Assembly process from a multilayer Meta-web (continuous time, core)}
+\title{Simulation of an assembly process from a multilayer meta-web: C++ core}
 \usage{
 metaWebNetAssemblyMLCT(metaW, M, Dep, m, e, se, time)
 }
 \arguments{
 \item{metaW}{Logical trophic adjacency matrix of the meta-web, \code{metaW[j, i]} is \code{TRUE} if \emph{j} is a prey of \emph{i}.}
 
-\item{M}{Numeric matrix, \code{M[i, j]} is the effect of the presence of \emph{j} on the log extinction rate of \emph{i}.}
+\item{M}{Numeric matrix, \code{M[i, j]} is the effect of the presence of \emph{j} on the log extinction rate of \emph{i}
+(the diagonal is ignored).}
 
 \item{Dep}{Logical matrix, \code{Dep[i, j]} is \code{TRUE} if \emph{i} depends obligately on \emph{j}.}
 
@@ -22,27 +23,34 @@ metaWebNetAssemblyMLCT(metaW, M, Dep, m, e, se, time)
 \item{time}{Simulated time, the state is recorded at integer times 1 to time-1}
 }
 \value{
-A list as \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}}: S, L, STime and the trophic adjacency matrix A with effective links,
-plus \code{rejected}, the number of rejected extinction proposals.
+A list as \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}}: \code{S} and \code{L} (number of species with trophic links and of trophic
+links at each time), \code{STime} (species presence, species x time) and \code{A} (trophic adjacency matrix of the final
+local web), plus \code{rejected}, the number of rejected extinction proposals.
 }
 \description{
-Core simulation used by \code{\link[=metaWebNetAssemblyML]{metaWebNetAssemblyML()}}, which builds its matrix arguments from a list of
-layers. It is the continuous time model of \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}} with two additions:
+Low level simulation used by \code{\link[=metaWebNetAssemblyML]{metaWebNetAssemblyML()}}. Most users should call \code{\link[=metaWebNetAssemblyML]{metaWebNetAssemblyML()}}, which
+takes the network as layers and the effects as the parameters \code{beta}; this function takes instead the three
+matrices built from them by \code{\link[=build_multilayer_assembly]{build_multilayer_assembly()}}. Use it directly to run many simulations of the same
+network without rebuilding the matrices.
 }
 \details{
+It is the continuous time model of \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}} with two additions:
 \itemize{
 \item \strong{Non-trophic modifiers of extinction}: the extinction rate of species \emph{i} depends on which species
-are present, \eqn{e_i(t) = e_i \exp(\sum_j M_{ij} x_j(t))}, where \eqn{x_j(t)} is 1 if species \emph{j} is present.
-A negative \eqn{M_{ij}} (e.g. a mutualist or a facilitator) lowers the extinction rate of \emph{i} while \emph{j} is present,
-a positive one (e.g. a competitor) raises it. With \code{M = 0} the model is \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}}.
-\item \strong{Obligate dependence}: if species \emph{i} depends on at least one species (\code{Dep[i, ]} has a \code{TRUE}) and none of them
-is present, \emph{i} goes extinct with the secondary extinction rate \emph{se}, as a predator without prey does.
+are present, \eqn{e_i(t) = e_i \exp(\sum_j M_{ij} x_j(t))}, where \eqn{x_j(t)} is 1 if species \emph{j} is
+present. \code{M} is in units of log extinction rate: \code{\link[=build_multilayer_assembly]{build_multilayer_assembly()}} puts \eqn{-\beta_+} (divided by
+the number of positive partners if \code{normalize = TRUE}) where \emph{j} has a positive effect on \emph{i}, and
+\eqn{+\beta_-} where it has a negative one. So a negative \eqn{M_{ij}} (a mutualist, a facilitator) lowers the
+extinction rate of \emph{i} while \emph{j} is present and a positive one (a competitor) raises it.
+With \code{M = 0} the model is \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}}.
+\item \strong{Obligate dependence}: if species \emph{i} depends on at least one species (\code{Dep[i, ]} has a \code{TRUE}) and none of
+them is present, \emph{i} goes extinct with the secondary extinction rate \emph{se}, as a predator without prey does.
 }
 
 The state dependent extinction rate is simulated exactly by thinning: extinction events are proposed with the
-upper bound \eqn{e_i \exp(\sum_j \max(M_{ij},0))} and accepted with probability \eqn{e_i(t)} divided by that bound.
-Large positive values in \code{M} make the bound large and the simulation slower (more rejected events).
+upper bound \eqn{e_i \exp(\sum_j \max(M_{ij},0))} and accepted with probability \eqn{e_i(t)} divided by that
+bound. Large positive values in \code{M} make the bound large and the simulation slower (more rejected proposals).
 }
 \seealso{
-\code{\link[=metaWebNetAssemblyML]{metaWebNetAssemblyML()}}, \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}}
+\code{\link[=metaWebNetAssemblyML]{metaWebNetAssemblyML()}}, \code{\link[=build_multilayer_assembly]{build_multilayer_assembly()}}, \code{\link[=metaWebNetAssemblyCT]{metaWebNetAssemblyCT()}}
 }

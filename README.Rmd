@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 [![DOI](https://zenodo.org/badge/github/130283899.svg)](https://doi.org/10.5281/zenodo.3451483)
 
 
-This package simulates the assembly of ecological networks from a regional metaweb. Two main models are implemented; first the trophic theory of island biogeography [2] with the addition that secondary extinctions are not fixed but happen with a defined probability. Second a generalized Lotka-Volterra stochastic model. Species can migrate from the metaweb and establish the ecological interactions specified in the metaweb.
+This package simulates the assembly of ecological networks from a regional metaweb. Three main models are implemented; first the trophic theory of island biogeography [2] with the addition that secondary extinctions are not fixed but happen with a defined probability. Second a generalized Lotka-Volterra stochastic model. Third, a multilayer version of the first model in which non-trophic interactions (mutualism, facilitation, competition) change the extinction rates. Species can migrate from the metaweb and establish the ecological interactions specified in the metaweb.
 
 License: MIT
 
@@ -38,6 +38,73 @@ install_github('lsaravia/meweasmo')
 library(meweasmo)
 
 ```
+
+## Get started with the trophic assembly model
+
+`metaWebNetAssemblyCT()` simulates the assembly of a local food web from a regional metaweb in continuous time,
+following the trophic theory of island biogeography [2] as extended in [1]:
+
+* species arrive from the metaweb with migration rate *m*,
+* present species go extinct with rate *e*,
+* predators with no prey in the local web go extinct with the secondary extinction rate *se*.
+
+Only the links among the species present are realized. The metaweb is a logical matrix where `metaW[j, i]` is
+`TRUE` if species *j* is a prey of species *i*. As an example we build a random metaweb of 40 species in which
+species only eat species with a lower index, so the first ones are basal:
+
+```{r ct-metaweb}
+library(meweasmo)
+set.seed(1)
+S0 <- 40
+metaW <- matrix(FALSE, S0, S0)
+metaW[upper.tri(metaW)] <- runif(S0 * (S0 - 1) / 2) < 0.1
+sum(colSums(metaW) == 0)               # basal species
+```
+
+Simulate 500 time units with the same rates for all species:
+
+```{r ct-simulate}
+tf <- 500
+sim <- metaWebNetAssemblyCT(metaW, m = rep(0.1, S0), e = rep(0.05, S0), se = rep(0.5, S0), time = tf)
+names(sim)
+```
+
+`S` and `L` are the number of species with trophic links and of links in the local web at each time, `STime`
+the presence of each species (species x time) and `A` the adjacency matrix of the local web at the end:
+
+```{r ct-plot, fig.width=6, fig.height=4}
+plot(2:(tf - 1), sim$S[2:(tf - 1)], type = "l", xlab = "Time", ylab = "Species (S)")
+c(metaweb_S = S0, local_S = mean(sim$S[400:(tf - 1)]),
+  local_C = mean(sim$L[400:(tf - 1)] / sim$S[400:(tf - 1)]^2))
+```
+
+The local web reaches a stochastic equilibrium below the size of the metaweb, set by the balance between
+migration and (primary and secondary) extinction. In [1] the rates *m*, *e* and *se* are fitted by approximate
+Bayesian computation to the number of species and the connectance of empirical food webs.
+
+## Multilayer networks: trophic and non-trophic interactions
+
+`metaWebNetAssemblyML()` extends `metaWebNetAssemblyCT()` to multilayer networks. The trophic layer
+defines the meta-web and the secondary extinctions, as in `metaWebNetAssemblyCT()`; the non-trophic layers change
+the extinction rates: losing a mutualist or a habitat provider raises the extinction rate of a species, losing a
+competitor lowers it. Optionally, species can depend obligately on others (e.g. foundation species). The network
+can be an `mgraph` from the [multiweb](https://github.com/lsaravia/multiweb) package, a list of igraph layers, or
+an edge list.
+
+```{r, eval=FALSE}
+fpath <- system.file("extdata", package = "multiweb")
+dn <- list.files(fpath, pattern = "^Kefi2015.*\\.txt$")
+mg <- multiweb::readMultiplex(dn, types = c("Negative", "Positive", "Trophic"), fpath, skipColumn = 2)
+
+# sign of the effect received by the species at the origin and at the end of each link
+layers <- data.frame(layer = c("Trophic", "Positive", "Negative"), sign_from = c(-1, 1, -1),
+                     sign_to = c(1, 0, 0), rule = c("trophic", "modifier", "modifier"))
+
+r <- metaWebNetAssemblyML(mg, layers, beta = c(pos = 1, neg = 1), m = 0.1, e = 0.05, se = 0.5, time = 300)
+```
+
+See the article [Assembly of multilayer networks](https://lsaravia.github.io/meweasmo/articles/multilayer-assembly.html)
+(`vignette("multilayer-assembly")`) for a worked example with the Chilean rocky intertidal network of Kéfi et al. (2015).
 
 ## Get Started with Generalized Lotka-volterra model
 
@@ -86,6 +153,7 @@ calcPropInteractionsGLVadjMat(A,yini)
 
 ```{r}
 
+set.seed(42)
 A1 <- metaWebNetAssemblyGLV(A,m,r,yini,1000,0.1)
 
 ```

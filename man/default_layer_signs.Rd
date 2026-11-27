@@ -10,18 +10,23 @@ default_layer_signs()
 a data.frame with columns \code{layer}, \code{sign_from}, \code{sign_to} and \code{rule}.
 }
 \description{
-Each layer is coded by the sign of the effect on the species at the origin (\code{from}) and at the end (\code{to})
-of its links. The convention is that links go from the species with the lower sign to the species with the
+A table with the layers expected by \code{\link[=build_multilayer_assembly]{build_multilayer_assembly()}} when the links carry no sign attribute.
+\code{sign_from} and \code{sign_to} are the signs of the effect received by the species at the origin and at the end of
+each link. The defaults assume that links go from the species with the lower sign to the species with the
 higher sign: trophic links from the prey (-) to the predator (+), commensalism from the unaffected species (0)
-to the beneficiary (+), amensalism from the harmed species (-) to the unaffected one (0). Mutualism and
-competition are symmetric.
+to the beneficiary (+), amensalism from the harmed species (-) to the unaffected one (0). Mutualism (+,+) and
+competition (-,-) are symmetric, and non-trophic antagonism is coded (-,+) like a trophic link.
 }
 \details{
-\code{rule} is \code{"trophic"} for the layer used for the prey rule (a predator without prey goes extinct with rate \emph{se})
-and \code{"modifier"} for the layers whose links change the extinction rates.
+Datasets use different conventions, so check the direction of the links and edit the table (or use a sign
+attribute per link, see \code{effect_attr} in \code{\link[=build_multilayer_assembly]{build_multilayer_assembly()}}) before simulating.
 
-Non-trophic antagonism is coded as (-,+), as a trophic link; change it if that is not what the data mean.
+\code{rule} is \code{"trophic"} for the layer that defines the meta-web and the prey rule, and \code{"modifier"} for the
+layers whose links change the extinction rates.
+}
+\examples{
+default_layer_signs()
 }
 \seealso{
-\code{\link[=metaWebNetAssemblyML]{metaWebNetAssemblyML()}}
+\code{\link[=build_multilayer_assembly]{build_multilayer_assembly()}}, \code{\link[=metaWebNetAssemblyML]{metaWebNetAssemblyML()}}
 }

@@ -17,51 +17,70 @@ build_multilayer_assembly(
 )
 }
 \arguments{
-\item{mg}{the multilayer network: an \code{mgraph} or a list of igraph layers (layer id = list name, or the
-\code{type_attr} edge attribute if the list has no names), a single igraph with the layer in the edge attribute
-\code{type_attr}, or a data.frame with columns \code{from}, \code{to} and \code{layer}.}
+\item{mg}{the multilayer network: an \code{mgraph} (the list of igraph layers returned by \code{multiweb::readMultiplex()})
+or any list of igraph layers, where the layer id is the list name or, if the list has no names, the
+\code{type_attr} edge attribute; a single igraph with the layer id in the edge attribute \code{type_attr}; or a
+data.frame with columns \code{from}, \code{to}, \code{layer} and, optionally, the sign column \code{effect_attr}. Vertices need a
+\code{name} attribute.}
 
-\item{layers}{data.frame with the layer signs and rules, see \code{\link[=default_layer_signs]{default_layer_signs()}}. Every layer present in
-\code{mg} must be in it, and exactly one layer must have \code{rule == "trophic"}.}
+\item{layers}{data.frame with one row per layer: \code{layer} (the id), \code{sign_from}, \code{sign_to} and \code{rule}
+(\code{"trophic"} or \code{"modifier"}); see \code{\link[=default_layer_signs]{default_layer_signs()}}. Every layer of \code{mg} must be in it, and exactly one
+must have \code{rule == "trophic"}.}
 
-\item{beta}{numeric vector \code{c(pos = , neg = )}, strength of positive and negative effects on the log extinction rate.}
+\item{beta}{named numeric vector \code{c(pos = , neg = )}: strength of the positive and of the negative effects on the
+log extinction rate. With \code{normalize = TRUE}, \code{exp(beta)} is the largest factor by which the partners can
+change the extinction rate.}
 
-\item{layer_beta}{optional named numeric vector, multiplies \code{beta} for each layer (default 1).}
+\item{layer_beta}{optional named numeric vector, a multiplier of \code{beta} for each layer (default 1).}
 
-\item{obligate_on}{character vector of species (e.g. the foundation species). A species that receives a
-positive effect from any of them in the layers \code{obligate_layers} depends obligately on them (and is not one
-of them). \code{NULL} for no obligate dependence.}
+\item{obligate_on}{character vector of species on which others can depend obligately (e.g. foundation
+species), or \code{NULL} (default) for no obligate dependence.}
 
 \item{type_attr}{name of the edge attribute with the layer id.}
 
 \item{effect_attr}{name of the edge attribute (or data.frame column) with the sign of the effect of \code{from} on
-\code{to}; \code{NULL} or a missing attribute to use the layer signs.}
+\code{to}. If it is \code{NULL} or missing, the layer signs are used.}
 
 \item{obligate_layers}{layers whose positive effects create obligate dependence; \code{NULL} (default) uses all
 modifier layers.}
 
-\item{normalize}{if \code{TRUE} (default) the positive and the negative effects on each species are divided by
-its number of positive and negative partners in the meta-web, so the extinction rate is
-\eqn{e_i \exp(\beta_- f^-_i - \beta_+ f^+_i)}, where \eqn{f} are the fractions of partners present, and
-\eqn{\exp(\beta)} is the largest possible change. With \code{FALSE} the effects add up per partner present, and a
-species with many mutualists can become practically immortal.}
+\item{normalize}{if \code{TRUE} (default) the positive and negative effects on each species are divided by its
+number of positive and negative partners, so that the effect depends on the fraction of partners present.
+With \code{FALSE} the effects add up per partner present, and a species with many mutualists can become practically
+immortal.}
 }
 \value{
-a list with \code{metaW}, \code{M}, \code{Dep} (species as dimnames) and \code{species}.
+a list with \code{metaW} (logical, \code{metaW[j, i]} is \code{TRUE} if \code{j} is a prey of \code{i}), \code{M} (numeric), \code{Dep}
+(logical), all with the species as dimnames, and \code{species}.
 }
 \description{
-Builds the trophic matrix, the extinction modifier matrix and the obligate dependence matrix used by
-\code{\link[=metaWebNetAssemblyMLCT]{metaWebNetAssemblyMLCT()}} from a multilayer network. Called by \code{\link[=metaWebNetAssemblyML]{metaWebNetAssemblyML()}}; useful by itself to
-check how the layers were translated.
+Translates a multilayer network and the parameters \code{beta} into the three matrices used by
+\code{\link[=metaWebNetAssemblyMLCT]{metaWebNetAssemblyMLCT()}}: the trophic meta-web \code{metaW}, the matrix \code{M} of effects on the log extinction rate,
+and the obligate dependence matrix \code{Dep}. It is called by \code{\link[=metaWebNetAssemblyML]{metaWebNetAssemblyML()}}; use it directly to check how
+the layers were translated.
 }
 \details{
-If the links have a sign attribute (\code{effect_attr}, values \code{"+"}/\code{"-"} or numbers), each link \code{a -> b} is read
-as the effect of \code{a} on \code{b} and only adds \code{-beta_pos} (positive) or \code{+beta_neg} (negative) to \code{M[b, a]}; the effect
-of \code{b} on \code{a}, if any, must be another link \code{b -> a}. This is how the mussel-fucus networks are coded, and then
-the signs in \code{layers} are not used for the modifier layers. Otherwise the layer signs are used:
-for a modifier layer with signs (\code{sign_from}, \code{sign_to}), a link \code{a -> b} adds \code{-beta_l * sign_to} to \code{M[b, a]}
-and \code{-beta_l * sign_from} to \code{M[a, b]}, where \code{beta_l} is \code{beta["pos"]} for a positive sign and \code{beta["neg"]}
-for a negative one, times \code{layer_beta[layer]}. Thus the presence of a species with a positive effect lowers the
-extinction rate and one with a negative effect raises it. Pairs linked in several layers add their effects.
-In symmetric layers each pair is counted once whatever the number of directions recorded.
+\strong{Signs of the links.} Each modifier link gives the sign (+1, 0 or -1) of the effect that each of the two
+species receives from the other. The signs are taken from one of two sources:
+\itemize{
+\item a sign attribute per link (\code{effect_attr}, values \code{"+"}, \code{"-"} or numbers): the link \code{a -> b} is the effect of
+\code{a} on \code{b} only; an effect of \code{b} on \code{a} must be another link \code{b -> a}. A layer must have the attribute in all
+its links or in none.
+\item otherwise, the signs of the layer in \code{layers}: in a link \code{a -> b}, \code{a} receives \code{sign_from} and \code{b} receives
+\code{sign_to}.
+}
+
+\strong{From signs to \code{M}.} \code{M[i, j]} is the effect of the presence of \code{j} on the log extinction rate of \code{i}. A positive
+effect of \code{j} on \code{i} adds \code{-beta["pos"]} to \code{M[i, j]} and a negative one adds \code{+beta["neg"]}, both multiplied by
+\code{layer_beta[layer]} if given. Pairs linked in several layers add their effects. In symmetric layers
+(\code{sign_from == sign_to}) each pair counts once, however many directions are recorded. With \code{normalize = TRUE} the
+negative and positive entries of each row are then divided by the number of partners of that sign.
+
+\strong{Obligate dependence.} With \code{obligate_on}, \code{Dep[i, j]} is \code{TRUE} if \code{j} is in \code{obligate_on}, \code{i} is not, and
+\code{j} has a positive effect on \code{i} in one of \code{obligate_layers}.
+
+Self-loops are kept in the trophic layer (cannibals are their own prey) and dropped in the modifier layers.
+}
+\seealso{
+\code{\link[=metaWebNetAssemblyML]{metaWebNetAssemblyML()}}, \code{\link[=default_layer_signs]{default_layer_signs()}}
 }
