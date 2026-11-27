@@ -19,7 +19,8 @@ knitr::opts_chunk$set(
 
 # meweasmo R-package: MEta-WEb ASsembly MOdels
 
-[![DOI](https://zenodo.org/badge/130283899.svg)](https://zenodo.org/badge/latestdoi/130283899)
+[![DOI](https://zenodo.org/badge/github/130283899.svg)](https://doi.org/10.5281/zenodo.3451483)
+
 
 This package simulates the assembly of ecological networks from a regional metaweb. Two main models are implemented; first the trophic theory of island biogeography [2] with the addition that secondary extinctions are not fixed but happen with a defined probability. Second a generalized Lotka-Volterra stochastic model. Species can migrate from the metaweb and establish the ecological interactions specified in the metaweb.
 
