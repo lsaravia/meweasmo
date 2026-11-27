@@ -1,3 +1,14 @@
+# meweasmo 0.3.1
+
+* Documentation of the multilayer model rewritten: how `beta` becomes the matrix `M` of
+  `metaWebNetAssemblyMLCT()`, the two sources of link signs (layer table or per-link attribute),
+  and the convention of `default_layer_signs()`.
+* New article `vignette("multilayer-assembly")` with the Chilean rocky intertidal multiplex
+  network of Kéfi et al. (2015) from the multiweb package.
+* pkgdown site (https://lsaravia.github.io/meweasmo/) built by GitHub Actions.
+* README: section on multilayer networks.
+* Removed the placeholder `MetaWebAssemblyModels-package` help page.
+
 # meweasmo 0.3.0
 
 ## New features
