@@ -6,10 +6,12 @@
 [![DOI](https://zenodo.org/badge/130283899.svg)](https://zenodo.org/badge/latestdoi/130283899)
 
 This package simulates the assembly of ecological networks from a
-regional metaweb. Two main models are implemented; first the trophic
+regional metaweb. Three main models are implemented; first the trophic
 theory of island biogeography \[2\] with the addition that secondary
 extinctions are not fixed but happen with a defined probability. Second
-a generalized Lotka-Volterra stochastic model. Species can migrate from
+a generalized Lotka-Volterra stochastic model. Third, a multilayer version
+of the first model in which non-trophic interactions (mutualism,
+facilitation, competition) change the extinction rates. Species can migrate from
 the metaweb and establish the ecological interactions specified in the
 metaweb.
 
